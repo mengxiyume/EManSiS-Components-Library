@@ -1,0 +1,143 @@
+#pragma once
+#include <utility>
+
+#include "../math/math_caculater"
+#include "../exception/pointerException.h"
+
+namespace emansis {
+    namespace atom {
+        /// @brief  算元-由初始计算，迭代计算，停止计算与额外计算及数据组成
+        class Atom {
+        #pragma region types define
+        public:
+            /// @brief 	    计算类型
+		    typedef double 	Precision_Type;
+		    /// @brief 	    数据处理函数类型
+		    typedef Math::ProcFunc<Precision_Type&&> Proc;
+            /// @brief      结束状态
+            enum state_stopper {
+                state_stop      = false,
+                state_continue  = true
+            };
+        #pragma endregion
+
+        #pragma region static functions
+        public:
+            /// @brief      默认处理函数
+            inline static const Proc default_proc           = [](Precision_Type&& cache)->void const { /*默认函数不做任何处理*/ };
+            /// @brief      默认初始处理函数
+            inline static const Proc default_initializer    = default_proc;
+            /// @brief      默认迭代计算函数
+            inline static const Proc default_computation    = default_proc;
+            /// @brief      默认额外计算函数
+            inline static const Proc default_afterProc      = default_proc;
+        #pragma endregion
+
+        #pragma region member operation functions
+        public:
+            /// @brief      获取初始处理函数
+            /// @return     初始处理函数的引用
+            inline Proc&    initializer ()                      { if (m_pfnInitializer  == nullptr) throw exception::Pointer::NullPointerException(__FILE__, __LINE__, "pfnInitializer function is nullptr");           return *m_pfnInitializer; }
+            /// @brief      设置初始处理函数
+            /// @param newInitializer   新的初始处理函数
+            inline void     initializer (Proc& newInitializer)  { if (&newInitializer   == nullptr) throw exception::Pointer::NullPointerException(__FILE__, __LINE__, "input initializer function is null reference"); m_pfnInitializer = &newInitializer; }
+            /// @brief      获取迭代计算函数
+            /// @return     迭代计算函数的引用
+            inline Proc&    computation ()                      { if (m_pfnComputation  == nullptr) throw exception::Pointer::NullPointerException(__FILE__, __LINE__, "pfnComputation function is nullptr");           return *m_pfnComputation; }
+            /// @brief      设置迭代计算函数
+            /// @param newComputation   新的迭代计算函数
+            inline void     computation (Proc& newComputation)  { if (&newComputation   == nullptr) throw exception::Pointer::NullPointerException(__FILE__, __LINE__, "input computation function is null reference"); m_pfnComputation = &newComputation; }
+            /// @brief      获取额外计算函数
+            /// @return     额外计算函数的引用
+            inline Proc&    after       ()                      { if (m_pfnAfterProc    == nullptr) throw exception::Pointer::NullPointerException(__FILE__, __LINE__, "pfnAfterProc function is nullptr");             return *m_pfnAfterProc;}
+            /// @brief      设置额外计算函数
+            /// @param newAfterProc     新的额外计算函数
+            inline void     after       (Proc& newAfterProc)    { if (&newAfterProc     == nullptr) throw exception::Pointer::NullPointerException(__FILE__, __LINE__, "input arterProc function is null reference");   m_pfnAfterProc = &newAfterProc; }
+            /// @brief      获取缓存对象
+            /// @return     缓存对象的常引用
+            inline const    Precision_Type& cache () const      { return m_objCache; }
+            /// @brief      更改缓存对象
+            /// @param newData  新的缓存对象
+            inline void     cache       (Precision_Type&&   newData)    { m_objCache = newData; }
+            /// @brief      更改缓存对象
+            /// @param newData  新的缓存对象
+            inline void     cache       (Precision_Type&    newData)    { m_objCache = newData; }
+        protected:
+            /// @brief              构造函数
+            /// @param initProc     初始处理函数
+            /// @param computProc   迭代计算函数
+            /// @param afterProc    额外计算函数
+            void setProcFunctions(
+            const Proc& initProc    = default_initializer,
+            const Proc& computProc  = default_computation,
+            const Proc& afterProc   = default_afterProc) {
+                initializer (const_cast<Proc&>(initProc));
+                computation (const_cast<Proc&>(computProc));
+                after       (const_cast<Proc&>(afterProc));
+            }
+            /// @brief      丢弃现有所有处理函数
+            void clearProc() {
+                m_pfnInitializer    = 
+                m_pfnComputation    =
+                m_pfnAfterProc      =
+                nullptr;
+            }
+        #pragma endregion
+
+        #pragma region constructors and destructor
+        public:
+            /// @brief              构造函数
+            /// @param initProc     初始处理函数
+            /// @param computProc   迭代计算函数
+            /// @param afterProc    额外计算函数
+            Atom(
+            const Proc& initProc    = default_initializer,
+            const Proc& computProc  = default_computation,
+            const Proc& afterProc   = default_afterProc) 
+            : m_pfnInitializer  (nullptr)
+            , m_pfnComputation  (nullptr)
+            , m_pfnAfterProc    (nullptr)
+            , m_objCache        (Precision_Type()) {
+                setProcFunctions(initProc, computProc, afterProc);
+            }
+        #pragma endregion
+            
+        #pragma region  please inheritannce these functions
+        public:
+            /// @brief  停止器-纯虚函数-中间函数
+            /// @return 继承者自建函数获取数据计算并返还是否结束
+            virtual state_stopper stopper() = 0;
+            /// @brief  单次运行原子-纯虚函数-由继承者实现并最终调用goRun
+            virtual void go     ()          = 0;
+            /// @brief  进行原子运算-虚函数-继承者可自行更改
+        protected:
+            virtual void goRun  () {
+                //初始化
+                initializer()(std::move(cache(false)));
+                //计算 迭代计算->
+                do { Math::gs_caculater(std::move(cache(false)), after(), computation()); } 
+                while(stopper() != state_stop);
+            }
+        #pragma endregion
+        
+        #pragma region private functions
+        private:
+            /// @brief      获取缓存对象
+            /// @return     缓存对象的引用
+            inline  Precision_Type&     cache(bool)     { return m_objCache; };
+        #pragma endregion
+
+        #pragma region members
+        private:
+            /// @brief  数据初始化函数
+            Proc*   m_pfnInitializer    = nullptr;
+            /// @brief  数据迭代计算函数
+            Proc*   m_pfnComputation    = nullptr;
+            /// @brief  额外计算函数
+            Proc*   m_pfnAfterProc      = nullptr;
+            /// @brief  计算缓存对象
+            Precision_Type m_objCache;
+        #pragma endregion
+        };
+    }
+}

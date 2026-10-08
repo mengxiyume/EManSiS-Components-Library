@@ -1,0 +1,95 @@
+#pragma once
+#include <functional>
+#include <utility>
+
+namespace emansis {
+    namespace Math {
+        /// @brief                      处理函数包装器
+        /// @tparam Reg_Type_LeftRef        处理函数的公用数据引用类型
+        template<typename Reg_Type_Ref>
+        using ProcFunc = std::function<void(Reg_Type_Ref)>;
+        /// @brief 数学函数计算模拟器
+        struct Caculater {
+            /// @brief                  递归展开停止函数 value_ref_type:(&&-&_) 
+            /// @tparam Result_Type     计算结果返回值类型
+            /// @param registerObject   处理数据的存放器，每一个ProcFunc都需要对其进行处理
+            /// @param proc             数据处理仿函数对象
+            /// @return                 完成处理后的数据引用
+            template<typename Result_Type>
+            Result_Type&& operator()(Result_Type&& registerObject, ProcFunc<Result_Type&&>& proc) const
+            { /*std::cout << "(&&-&_) ";*/ proc(std::forward<Result_Type>(registerObject)); return std::forward<Result_Type>(registerObject); }
+            /// @brief                  递归展开函数 value_ref_type:(&&-&_)
+            /// @tparam Result_Type     计算结果返回值类型
+            /// @tparam ProcFunc        数据处理仿函数类
+            /// @tparam ...ProcFuncArgs 处理仿函数参数列表包
+            /// @param registerObject   处理数据的存放器，每一个ProcFunc都需要对其进行处理，该参数决定最终返回类型
+            /// @param proc             数据处理仿函数对象
+            /// @param ...func_packge   处理仿函数对象参数包
+            /// @return                 完成处理后的数据引用
+            template<typename Result_Type, class ...ProcFuncArgs>
+            Result_Type&& operator()(Result_Type&& registerObject, ProcFunc<Result_Type&&>& proc, ProcFuncArgs... func_packge) const
+            { proc(std::forward<Result_Type>(registerObject)); return std::forward<Result_Type>(operator()(std::forward<Result_Type>(registerObject), func_packge...)); }
+
+            /// @brief                  递归展开停止函数 value_ref_type:(&&-&&)
+            /// @tparam Result_Type     计算结果返回值类型
+            /// @param registerObject   处理数据的存放器，每一个ProcFunc都需要对其进行处理
+            /// @param proc             数据处理仿函数对象
+            /// @return                 完成处理后的数据引用
+            template<typename Result_Type>
+            Result_Type&& operator()(Result_Type&& registerObject, ProcFunc<Result_Type&&>&& proc) const
+            { /*std::cout << "(&&-&&) ";*/ proc(std::forward<Result_Type>(registerObject)); return std::forward<Result_Type>(registerObject); }
+            /// @brief                  递归展开函数 value_ref_type:(&&-&&)
+            /// @tparam Result_Type     计算结果返回值类型
+            /// @tparam ProcFunc        数据处理仿函数类
+            /// @tparam ...ProcFuncArgs 处理仿函数参数列表包
+            /// @param registerObject   处理数据的存放器，每一个ProcFunc都需要对其进行处理，该参数决定最终返回类型
+            /// @param proc             数据处理仿函数对象
+            /// @param ...func_packge   处理仿函数对象参数包
+            /// @return                 完成处理后的数据引用
+            template<typename Result_Type, class ...ProcFuncArgs>
+            Result_Type&& operator()(Result_Type&& registerObject, ProcFunc<Result_Type&&>&& proc, ProcFuncArgs... func_packge) const
+            { proc(std::forward<Result_Type>(registerObject)); return std::forward<Result_Type>(operator()(std::forward<Result_Type>(registerObject), func_packge...)); }
+        
+            /// @brief                  递归展开停止函数 value_ref_type:(&_-&_)
+            /// @tparam Result_Type     计算结果返回值类型
+            /// @param registerObject   处理数据的存放器，每一个ProcFunc都需要对其进行处理
+            /// @param proc             数据处理仿函数对象
+            /// @return                 完成处理后的数据引用
+            template<typename Result_Type>
+            Result_Type& operator()(Result_Type& registerObject, ProcFunc<Result_Type&>& proc) const
+            { /*std::cout << "(&_-&_) ";*/ proc(registerObject); return registerObject; }
+            /// @brief                  递归展开函数 value_ref_type:(&_-&_)
+            /// @tparam Result_Type     计算结果返回值类型
+            /// @tparam ProcFunc        数据处理仿函数类
+            /// @tparam ...ProcFuncArgs 处理仿函数参数列表包
+            /// @param registerObject   处理数据的存放器，每一个ProcFunc都需要对其进行处理，该参数决定最终返回类型
+            /// @param proc             数据处理仿函数对象
+            /// @param ...func_packge   处理仿函数对象参数包
+            /// @return                 完成处理后的数据引用
+            template<typename Result_Type, class ...ProcFuncArgs>
+            Result_Type& operator()(Result_Type& registerObject, ProcFunc<Result_Type&>& proc, ProcFuncArgs... func_packge) const
+            { proc(registerObject); return operator()(registerObject, func_packge...); }
+
+            /// @brief                  递归展开停止函数 value_ref_type:(&_-&&)
+            /// @tparam Result_Type     计算结果返回值类型
+            /// @param registerObject   处理数据的存放器，每一个ProcFunc都需要对其进行处理
+            /// @param proc             数据处理仿函数对象
+            /// @return                 完成处理后的数据引用
+            template<typename Result_Type>
+            Result_Type& operator()(Result_Type& registerObject, ProcFunc<Result_Type&>&& proc) const
+            { /*std::cout << "(&_-&&) ";*/ proc(registerObject); return registerObject; }
+            /// @brief                  递归展开函数 value_ref_type:(&_-&&)
+            /// @tparam Result_Type     计算结果返回值类型
+            /// @tparam ProcFunc        数据处理仿函数类
+            /// @tparam ...ProcFuncArgs 处理仿函数参数列表包
+            /// @param registerObject   处理数据的存放器，每一个ProcFunc都需要对其进行处理，该参数决定最终返回类型
+            /// @param proc             数据处理仿函数对象
+            /// @param ...func_packge   处理仿函数对象参数包
+            /// @return                 完成处理后的数据引用
+            template<typename Result_Type, class ...ProcFuncArgs>
+            Result_Type& operator()(Result_Type& registerObject, ProcFunc<Result_Type&>&& proc, ProcFuncArgs... func_packge) const
+            { proc(registerObject); return operator()(registerObject, func_packge...); }
+        };
+        static Caculater gs_caculater;
+    }
+}

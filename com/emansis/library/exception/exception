@@ -1,0 +1,5 @@
+#pragma once
+#include "../../identify_tables/idt_exception.h"
+
+#include "./baseException.h"
+#include "./pointerException.h"

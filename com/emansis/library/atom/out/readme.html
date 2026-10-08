@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>&ast;&ast;&#x5982;&#x4f55;&#x7b80;&#x5355;&#x4f7f;&#x7528;&ast;&ast;</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <span id="markdown-mermaid" aria-hidden="true" data-config="{&quot;darkModeTheme&quot;:&quot;vscode&quot;,&quot;lightModeTheme&quot;:&quot;vscode&quot;,&quot;maxTextSize&quot;:50000,&quot;clickDrag&quot;:&quot;alt&quot;,&quot;showControls&quot;:&quot;onHoverOrFocus&quot;,&quot;resizable&quot;:true,&quot;maxHeight&quot;:&quot;&quot;}"></span>
+				<h1 id="如何简单使用"><strong>如何简单使用</strong></h1>
+<hr>
+<h2 id="继承atom类">继承'Atom'类</h2>
+<pre><code class="language-cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Example</span> : <span class="hljs-keyword">public</span> emansis::atom::Atom { <span class="hljs-comment">/*code*/</span> };
+</code></pre>
+<h2 id="在派生类重写纯虚函数">在派生类重写纯虚函数</h2>
+<h3 id="重写stopper">重写'stopper()'</h3>
+<pre><code class="language-cpp"><span class="hljs-comment">//stopper的返回值类型</span>
+<span class="hljs-comment">/// @brief      结束状态</span>
+<span class="hljs-keyword">enum</span> <span class="hljs-title class_">state_stopper</span> {
+    state_stop      = <span class="hljs-literal">false</span>,
+    state_continue  = <span class="hljs-literal">true</span>
+};
+</code></pre>
+<pre><code class="language-cpp"><span class="hljs-keyword">public</span>:
+<span class="hljs-comment">//基类的stopper是一个无参中间函数，通过它调用你的函数来进行控制</span>
+<span class="hljs-function"><span class="hljs-keyword">virtual</span> state_stopper <span class="hljs-title">stopper</span><span class="hljs-params">()</span> </span>{ 
+    <span class="hljs-comment">//这里调用你自己的stopper</span>
+    <span class="hljs-keyword">return</span> <span class="hljs-built_in">stopper</span>(conter_stopper);
+}
+<span class="hljs-keyword">private</span>:
+<span class="hljs-comment">/// @brief 停止计算计数器 </span>
+<span class="hljs-type">int</span> conter_stopper = <span class="hljs-number">0</span>;
+
+<span class="hljs-comment">/// @brief          停止器</span>
+<span class="hljs-comment">/// @param conter   计数器的引用</span>
+<span class="hljs-comment">/// @return         应该停止时返回Atom::state_stopper::state_stop，否则返回Atom::state_stopper::state_continue</span>
+<span class="hljs-function">state_stopper <span class="hljs-title">stopper</span><span class="hljs-params">(<span class="hljs-type">int</span>&amp; conter)</span> </span>{ <span class="hljs-keyword">return</span> --conter_stopper &lt;= <span class="hljs-number">0</span> ? state_stop : state_continue; }
+</code></pre>
+<h3 id="重写go">重写'go()'</h3>
+<p>写入数据计算与处理的代码
+调用'goRun()'函数进行处理</p>
+<pre><code class="language-cpp"><span class="hljs-keyword">public</span>:
+<span class="hljs-comment">/// @brief 继承纯虚函数go</span>
+<span class="hljs-function"><span class="hljs-keyword">virtual</span> <span class="hljs-type">void</span> <span class="hljs-title">go</span> <span class="hljs-params">()</span> </span>{
+    <span class="hljs-comment">//进行一些运行前操作</span>
+    <span class="hljs-built_in">setConter_stopper</span>(<span class="hljs-number">3</span>);
+    <span class="hljs-comment">//调用goRun进行运算</span>
+    <span class="hljs-built_in">goRun</span>();
+    <span class="hljs-comment">//进行运算后操作如输出</span>
+}
+</code></pre>
+<h2 id="使用控制函数对象控制计算流程">使用控制函数对象控制计算流程</h2>
+<h3 id="控制函数原型">控制函数原型</h3>
+<pre><code class="language-cpp"><span class="hljs-keyword">typedef</span> std::function&lt;<span class="hljs-type">void</span>()(Precision_Type&amp;&amp; cache)&gt; Proc;
+<span class="hljs-comment">/*
+* void proc(Precisison_Type&amp;&amp; cache) {
+*     //processing...
+* }
+* [](Precision_Type&amp;&amp; cache)-&gt;void {
+*     //processing...
+* };
+*/</span>
+</code></pre>
+<h3 id="三种控制函数">三种控制函数</h3>
+<h4 id="1初始化控制函数">1.初始化控制函数</h4>
+<pre><code class="language-cpp"><span class="hljs-comment">//进行初始化操作，对cache引用参数进行初始刷写</span>
+<span class="hljs-built_in">initializer</span> (Proc&amp; newInitializer);
+</code></pre>
+<h4 id="2计算控制函数">2.计算控制函数</h4>
+<pre><code class="language-cpp"><span class="hljs-comment">//进行计算操作，对cache引用参数进行计算与更改</span>
+<span class="hljs-built_in">computation</span> (Proc&amp; newComputation);
+</code></pre>
+<h4 id="3后处理操作函数">3.后处理操作函数</h4>
+<pre><code class="language-cpp"><span class="hljs-comment">//进行后处理操作</span>
+<span class="hljs-built_in">after</span>       (Proc&amp; newAfterProc);
+<span class="hljs-comment">//对cache引用参数进行补差与再计算</span>
+<span class="hljs-comment">//或者进行其他与cache引用参数无关的外部操作</span>
+</code></pre>
+<h3 id="如何使用控制函数">如何使用控制函数</h3>
+<h4 id="1使用构造函数传参传入控制函数对象">1.使用构造函数传参传入控制函数对象</h4>
+<pre><code class="language-cpp"><span class="hljs-built_in">Example</span>() : <span class="hljs-built_in">Atom</span>(initProc_1, computProc_1) { }
+</code></pre>
+<h4 id="2使用setter函数传入控制函数对象">2.使用setter函数传入控制函数对象</h4>
+<pre><code class="language-cpp"><span class="hljs-comment">//对应函数在介绍时有原型介绍</span>
+<span class="hljs-built_in">initializer</span>(<span class="hljs-built_in">const_cast</span>&lt;Proc&amp;&gt;(initProc));
+<span class="hljs-built_in">computation</span>(<span class="hljs-built_in">const_cast</span>&lt;Proc&amp;&gt;(computProc));
+</code></pre>
+<h2 id="实例化派生类">实例化派生类</h2>
+<pre><code class="language-cpp">Example e1;
+</code></pre>
+<h2 id="调用派生类对象的函数go">调用派生类对象的函数'go()'</h2>
+<pre><code class="language-cpp">e1.<span class="hljs-built_in">go</span>();
+</code></pre>
+<h2 id="调用派生类对象的函数cache获取计算结果">调用派生类对象的函数'cache()'获取计算结果</h2>
+<pre><code class="language-cpp">std::cout &lt;&lt; <span class="hljs-built_in">cache</span>() &lt;&lt; std::endl;
+</code></pre>
+<hr>
+<h1 id="进阶用法"><strong>进阶用法</strong></h1>
+<hr>
+<p>通过lambda捕获列表传入额外参数</p>
+
+            
+            
+        </body>
+        </html>
