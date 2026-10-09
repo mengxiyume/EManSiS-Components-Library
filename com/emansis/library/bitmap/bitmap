@@ -2,27 +2,54 @@
 #include <cstdint>
 #include "../../identify_tables/idt_exception.h"
 #include "./bitmapException.h"
+#include "../define_emansis.h"
 
 namespace emansis {
 
+    /// @brief          位图容器
+    /// @tparam Length  位图容器的容量 字节为单位
     template <uint8_t Length>
     class bitmap {
     private:
+        /// @brief      容器
         uint8_t m_arrData[Length ? Length : 1];
     public:
+        /// @brief              构造容器
+        /// @param initValue    容器内字节填充物
         bitmap(uint8_t initValue = 0) {
             for (uint8_t i = 0; i < Length; ++i) 
                 m_arrData[i] = initValue;
         }
-        uint8_t operator[](uint8_t index) const {
-            return m_arrData[index];
+        /// @brief              访问容器内元素
+        /// @param index        索引值
+        /// @return             索引的元素
+        const uint8_t& operator[](uint8_t index) const {
+            if (index >= Length) throw OUT_OF_RANGE_BITMAP_EXCEPTION_EMANSIS(index, "index longger of Length[" PATCH_VAR_EMANSIS(Length) "]" )
+            return operator()[index];
         }
+        /// @brief              取得容器内元素
+        /// @param index        索引值
+        /// @return             索引的元素
         uint8_t& operator[](uint8_t index) {
+            if (index >= Length) throw OUT_OF_RANGE_BITMAP_EXCEPTION_EMANSIS(index, "index longger of Length[" PATCH_VAR_EMANSIS(Length) "]" )
             return m_arrData[index];
         }
+        /// @brief              获取容器内数据
+        /// @return             单字节无符号数值类型数组
         uint8_t* data() {
                 return m_arrData;
         }
+        /// @brief              查询指定位置的位图元素的真值
+        /// @param pos          坐标
+        /// @return             如果该元素被设置的真值
+        bool have(uint64_t pos) { ; } //TODO: Achive the function
+        /// @brief              设置指定位置的位图元素真值
+        /// @param state        新的真值状态
+        /// @param pos          坐标
+        /// @return             旧的真值状态
+        bool set(bool state, uint64_t pos) { ; } //TODO: Achive the function
+        /// @brief              查看位图内是否有内容
+        /// @return             如果位图为空返回true，否则返回false
         bool empty() {
             for (int i = 0; i < _countof(m_arrData);) {
                 //层级过滤

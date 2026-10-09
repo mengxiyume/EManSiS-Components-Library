@@ -19,7 +19,7 @@ namespace emansis {
                 /// @brief  异常附带信息
                 ExceptionMessageText_Type m_textParam;
             public:
-                /// @brief              指针异常类构造
+                /// @brief              位图异常类构造
                 /// @param id           异常编号
                 /// @param msg          异常信息
                 /// @param valueName    异常指针

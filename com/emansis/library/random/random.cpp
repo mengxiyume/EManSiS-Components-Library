@@ -1,58 +1,43 @@
-#include "../../identify_tables/idt_exception.h"
 #include "./random.h"
-#include "../bitmap/bitmap"
 
 #include <cstdint>
-#include <ctime>
-#include <algorithm>
 
-namespace emansis {
-
-    //TODO: Random Seed setter
-
-    namespace random {
-        //TODO: use bitmap save random seed
-        using namespace random;
-        class Random {
-        private:
-        #define RANDOM_SEED_LENGTH (sizeof(int64_t) * 4)
-            static bitmap<RANDOM_SEED_LENGTH> gs_seed;
-            static uint8_t gs_seedIndex;
-        public:
-            Random(int64_t seedValue = (int64_t)time(nullptr)) {
-                seed(seedValue);
-            };
-            ~Random();
-            void seed(int64_t seed) {
-                if (isSeedValid() && seed == 0) {
-                    ; //TODO: throw exception
-                }
-                else if (seed != 0) { 
-                    for (int i = 0; i < RANDOM_SEED_LENGTH / sizeof(int64_t); i++) {
-                        //reg init
-                        int64_t reg = seed * (i + 1) * 0x7D3EC265D + 0xB;
-                        //xorShift
-                        reg ^= seed >> ((i * 32) % sizeof(int64_t) * 8);
-                        reg ^= seed << ((i * 57) % sizeof(int64_t) * 8);
-                        reg ^= seed >> ((i * 99) % sizeof(int64_t) * 8);
-                        //past
-                        ((int64_t*)gs_seed.data())[i] = reg;
-                    }
-                    
-                }
-            }
-            bitmap<RANDOM_SEED_LENGTH> seed() const { return gs_seed; }
-            
-            int8_t rand_i8(int8_t lower = INT8_MIN, int8_t upper = INT8_MAX) {
-                if (lower > upper) 
-                    std::swap(lower, upper);
-                int8_t reg = gs_seed[gs_seedIndex++];
-                ; //TODO: 进行xorShift生成随机数，使用种子对应位置的数据作为种子，并将种子对应位置的数据覆盖与索引移位
-
-            }
-        private:
-            bool isSeedValid() { return !gs_seed.empty(); }
-        #undef RANDOM_SEED_LENGTH
-        };
+void emansis::random::Random::seed(int64_t seed) {
+    if (isSeedValid() && seed == 0) {
+        throw RANDOM_SEED_OF_ZERO_EXCEPTION_EMANSIS(seed, "seed is dont set, and input seed is 0");
     }
+    else if (seed != 0) { 
+        for (int i = 0; i < RANDOM_SEED_LENGTH_EMANSIS / sizeof(int64_t); i++) {
+            //reg init
+            int64_t reg = seed * (i + 1) * 0x7D3EC265D + 0xB;
+            //xorShift
+            reg ^= seed >> ((i * 32) % sizeof(int64_t) * 8);
+            reg ^= seed << ((i * 57) % sizeof(int64_t) * 8);
+            reg ^= seed >> ((i * 99) % sizeof(int64_t) * 8);
+            //seed paste
+            ((int64_t*)gs_seed.data())[i] = reg;
+        }
+    }
+    if (!isSeedValid())
+        throw RANDOM_SEED_OF_ZERO_EXCEPTION_EMANSIS(seed, "the seed is not set, and input seed maked out seed is 0");
+}
+
+//Prototype: random functions
+
+int8_t emansis::random::Random::rand_i8(int8_t lower, int8_t upper) {
+    // abs left and right
+    if (lower > upper) std::swap(lower, upper);
+    //get seed
+    int8_t reg = gs_seed[gs_seedIndex];
+    if (reg == 0) reg = 97;
+    //xorShift
+    reg ^= reg >> (3 % sizeof(int8_t) * 1) & 0xFF;
+    reg ^= reg << (2 % sizeof(int8_t) * 1) & 0xFF;
+    reg ^= reg >> (5 % sizeof(int8_t) * 1) & 0xFF;
+    //update seed index
+    if (gs_seedIndex + 1 >= RANDOM_SEED_LENGTH_EMANSIS) gs_seedIndex = 0;
+    else ++gs_seedIndex;
+    //seed paste
+    gs_seed[gs_seedIndex] = reg;
+    return (reg % (upper - lower + 1)) + lower;
 }
