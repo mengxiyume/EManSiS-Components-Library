@@ -1,8 +1,6 @@
 #include "../../identify_tables/idt_exception.h"
 #include "../exception/baseException.h"
 
-//FIXME: 改写异常处理
-
 namespace emansis {
     namespace exception {
         namespace BitMap {
