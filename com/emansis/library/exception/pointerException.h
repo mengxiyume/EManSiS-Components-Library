@@ -5,7 +5,7 @@
 
 namespace emansis {
     namespace exception {
-        namespace BitMap {
+        namespace Pointer {
             /// @brief  指针异常
             class Exception : public BaseException {
             private:
@@ -63,7 +63,7 @@ namespace emansis {
                     ss.clear();
                     buffer +=   "\' On ";
                     buffer +=   getPath() == nullptr ? "error code is no such file" : getPath();
-                    buffer +=   " line:";
+                    buffer +=   ":";
                     ss << std::dec << getLine();
                     buffer +=   ss.str();
                     ss.str("");
@@ -78,6 +78,9 @@ namespace emansis {
             /// @param line     异常发生行
             /// @param param    额外信息
             class NullPointerException : public Exception { public: NullPointerException(const char* path, uint32_t line, const ExceptionMessageText_Type& param = "") : Exception(IDE_EXCEPTION_POINTER_NULLPOINTER, "This pointer is nullptr", nullptr, param, path, line) {} };
+        /// @brief              空指针异常宏定义
+        /// @param _PARAM_TEXT_ 额外信息
+        #define NULL_POINTER_EXCEPTION_EMANSIS(_PARAM_TEXT_) emansis::exception::Pointer::NullPointerException(__FILE__, __LINE__, (_PARAM_TEXT_))
         }
     }
 }

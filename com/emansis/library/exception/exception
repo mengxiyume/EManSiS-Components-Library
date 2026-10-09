@@ -3,3 +3,5 @@
 
 #include "./baseException.h"
 #include "./pointerException.h"
+#include "../random/randomException.h"
+#include "../bitmap/bitmapException.h"

@@ -37,22 +37,22 @@ namespace emansis {
         public:
             /// @brief      获取初始处理函数
             /// @return     初始处理函数的引用
-            inline Proc&    initializer ()                      { if (m_pfnInitializer  == nullptr) throw exception::Pointer::NullPointerException(__FILE__, __LINE__, "pfnInitializer function is nullptr");           return *m_pfnInitializer; }
+            inline Proc&    initializer ()                      { if (m_pfnInitializer  == nullptr) throw NULL_POINTER_EXCEPTION_EMANSIS("pfnInitializer function is nullptr");           return *m_pfnInitializer; }
             /// @brief      设置初始处理函数
             /// @param newInitializer   新的初始处理函数
-            inline void     initializer (Proc& newInitializer)  { if (&newInitializer   == nullptr) throw exception::Pointer::NullPointerException(__FILE__, __LINE__, "input initializer function is null reference"); m_pfnInitializer = &newInitializer; }
+            inline void     initializer (Proc& newInitializer)  { if (&newInitializer   == nullptr) throw NULL_POINTER_EXCEPTION_EMANSIS("input initializer function is null reference"); m_pfnInitializer = &newInitializer; }
             /// @brief      获取迭代计算函数
             /// @return     迭代计算函数的引用
-            inline Proc&    computation ()                      { if (m_pfnComputation  == nullptr) throw exception::Pointer::NullPointerException(__FILE__, __LINE__, "pfnComputation function is nullptr");           return *m_pfnComputation; }
+            inline Proc&    computation ()                      { if (m_pfnComputation  == nullptr) throw NULL_POINTER_EXCEPTION_EMANSIS("pfnComputation function is nullptr");           return *m_pfnComputation; }
             /// @brief      设置迭代计算函数
             /// @param newComputation   新的迭代计算函数
-            inline void     computation (Proc& newComputation)  { if (&newComputation   == nullptr) throw exception::Pointer::NullPointerException(__FILE__, __LINE__, "input computation function is null reference"); m_pfnComputation = &newComputation; }
+            inline void     computation (Proc& newComputation)  { if (&newComputation   == nullptr) throw NULL_POINTER_EXCEPTION_EMANSIS("input computation function is null reference"); m_pfnComputation = &newComputation; }
             /// @brief      获取额外计算函数
             /// @return     额外计算函数的引用
-            inline Proc&    after       ()                      { if (m_pfnAfterProc    == nullptr) throw exception::Pointer::NullPointerException(__FILE__, __LINE__, "pfnAfterProc function is nullptr");             return *m_pfnAfterProc;}
+            inline Proc&    after       ()                      { if (m_pfnAfterProc    == nullptr) throw NULL_POINTER_EXCEPTION_EMANSIS("pfnAfterProc function is nullptr");             return *m_pfnAfterProc;}
             /// @brief      设置额外计算函数
             /// @param newAfterProc     新的额外计算函数
-            inline void     after       (Proc& newAfterProc)    { if (&newAfterProc     == nullptr) throw exception::Pointer::NullPointerException(__FILE__, __LINE__, "input arterProc function is null reference");   m_pfnAfterProc = &newAfterProc; }
+            inline void     after       (Proc& newAfterProc)    { if (&newAfterProc     == nullptr) throw NULL_POINTER_EXCEPTION_EMANSIS("input afterProc function is null reference");   m_pfnAfterProc = &newAfterProc; }
             /// @brief      获取缓存对象
             /// @return     缓存对象的常引用
             inline const    Precision_Type& cache () const      { return m_objCache; }

@@ -1,4 +1,5 @@
 #include "../../../library/atom/atom"
+#include "../../../library/bitmap/bitmap"
 #include <iostream>
 #include <cstdint>
 #include <utility>
@@ -81,7 +82,6 @@ namespace emansis {
                     int baby = rand() % 2;
                     if      (baby == Male)  ++m_uMaleCount;
                     else if (baby == Femal) ++ m_uFemalCount;
-                    //TODO:生育意愿减少
                     if      (m_uMaleCount >= 1)
                         cache *= (1 - (0.4));
                     else
@@ -104,17 +104,31 @@ void test01() {
 }
 
 void test02() {
-    emansis::example::atom::Family f1;
-    for (int i = 0; i < 30; ++i) {
-        f1.go();
-        std::cout << f1 << std::endl;
-    }
+    // throw NULL_POINTER_EXCEPTION_EMANSIS("Test null pointer exception");
+    int subject = 325;
+    throw OUT_OF_RANGE_BITMAP_EXCEPTION_EMANSIS(subject, "Test out of range exception");
+    // emansis::example::atom::Family f1;
+    // for (int i = 0; i < 30; ++i) {
+    //     f1.go();
+    //     std::cout << f1 << std::endl;
+    // }
 }
 
 int main() {
     srand(time(nullptr));
     // test01();
+    try {
     test02();
-    
+    }
+    catch (emansis::exception::BaseException& e) {
+        std::cout << e.what() << std::endl;
+    }
+    catch (std::exception& e) {
+        std::cout << "std::exception:" << e.what() << std::endl;
+    }
+    catch (...) {
+        std::cout << "Unknown exception" << std::endl;
+
+    }
     return 0;
 }

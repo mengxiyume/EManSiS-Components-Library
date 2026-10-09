@@ -1,3 +1,4 @@
+#pragma once
 #include "../../identify_tables/idt_exception.h"
 #include "../exception/baseException.h"
 
@@ -62,14 +63,16 @@ namespace emansis {
                     ExceptionOutBuffer_Type 
                     buffer =    "BitmapException:";
                     buffer +=   toText();
-                    buffer +=   "value= ";
+                    buffer +=   "\'_";
                     buffer +=   getValName();
                     buffer +=   "[";
                     ss     <<   std::dec << getIndex();
                     buffer +=   ss.str();
-                    buffer +=   "] On ";
+                    ss.str("");
+                    ss.clear();
+                    buffer +=   "]_\' On ";
                     buffer +=   getPath() == nullptr ? "error code is no such file" : getPath();
-                    buffer +=   " line:";
+                    buffer +=   ":";
                     ss     <<   std::dec << getLine();
                     buffer +=   ss.str();
                     ss.str("");
@@ -79,13 +82,17 @@ namespace emansis {
                     return buffer;
                 }
             };
-            /// @brief          空指针异常
-            /// @param path     异常发生文件
-            /// @param line     异常发生行
-            /// @param valueName 异常变量名
-            /// @param param    额外信息
-            /// @param index    异常索引值
-            class OutOfRandBitMapException : public Exception { public: OutOfRandBitMapException(const char* path, uint32_t line, const char* valueName, const size_t index, const ExceptionMessageText_Type& param = "-1") : Exception(IDE_EXCEPTION_BITMAP_OUT_OF_RANGE, "Bitmap index is out of range", valueName, index, param, path, line) {} };
+            /// @brief              位图索引越界异常
+            /// @param path         异常发生文件
+            /// @param line         异常发生行
+            /// @param valueName    异常变量名
+            /// @param index        异常索引值
+            /// @param param        额外信息
+            class OutOfRangeBitMapException : public Exception { public: OutOfRangeBitMapException(const char* path, uint32_t line, const char* valueName, const size_t index, const ExceptionMessageText_Type& param = "-1") : Exception(IDE_EXCEPTION_BITMAP_OUT_OF_RANGE, "Bitmap index is out of range", valueName, index, param, path, line) {} };
+        /// @brief              位图索引越界异常宏定义
+        /// @param _VAR_        异常量
+        /// @param _PARAM_TEXT_ 额外信息
+        #define OUT_OF_RANGE_BITMAP_EXCEPTION_EMANSIS(_VAR_, _PARAM_TEXT_) emansis::exception::BitMap::OutOfRangeBitMapException(__FILE__, __LINE__, (#_VAR_), (_VAR_), (_PARAM_TEXT_))
         }
     }
 }

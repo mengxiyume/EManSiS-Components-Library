@@ -1,4 +1,7 @@
+#pragma once
 #include <cstdint>
+#include "../../identify_tables/idt_exception.h"
+#include "./bitmapException.h"
 
 namespace emansis {
 
