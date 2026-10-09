@@ -38,5 +38,33 @@
         #define IDE_EXCEPTION_POINTER_NULLPOINTER IDE_EXCEPTION_POINTER(0x0)
 
     #pragma endregion
+
+    /*
+    *  0x00102000
+    *  ...->随机数异常段
+    *  0x00102FFF
+    */
+    #pragma region error random
+    #define IDE_EXCEPTION_RANDOM_LOW   IDE_EXCEPTION_UNIT(0x02)
+    #define IDE_EXCEPTION_RANDOM_HEI   ((IDE_EXCEPTION_RANDOM_LOW) + (IDE_EXCEPTION_UNIT_WITH) - 1)
+    #define IDE_EXCEPTION_RANDOM(_OFFSET_) (IDE_EXCEPTION((IDE_EXCEPTION_RANDOM_LOW) + (_OFFSET_)))
+
+        #define IDE_EXCEPTION_RANDOM_SEED_OF_ZERO IDE_EXCEPTION_RANDOM(0x0)
+        
+    #pragma endregion
+
+    /*
+    *  0x00103000 
+    *  ...->位图异常段
+    * 0x00103FFF
+    */
+    #pragma region error bitmap
+    #define IDE_EXCEPTION_BITMAP_LOW   IDE_EXCEPTION_UNIT(0x03)
+    #define IDE_EXCEPTION_BITMAP_HEI   ((IDE_EXCEPTION_BITMAP_LOW) + (IDE_EXCEPTION_UNIT_WITH) - 1)
+    #define IDE_EXCEPTION_BITMAP(_OFFSET_) (IDE_EXCEPTION((IDE_EXCEPTION_BITMAP_LOW) + (_OFFSET_)))
+
+        #define IDE_EXCEPTION_BITMAP_OUT_OF_RANGE IDE_EXCEPTION_BITMAP(0x0) 
+
+    #pragma endregion
     
 #pragma endregion

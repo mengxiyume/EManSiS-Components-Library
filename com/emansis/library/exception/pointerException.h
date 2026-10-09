@@ -5,9 +5,9 @@
 
 namespace emansis {
     namespace exception {
-        namespace Pointer {
+        namespace BitMap {
             /// @brief  指针异常
-            class Pointer : public BaseException {
+            class Exception : public BaseException {
             private:
                 /// @brief  异常指针
                 const void* m_pErrPtr;
@@ -25,7 +25,7 @@ namespace emansis {
                 /// @param param        异常附带信息
                 /// @param ptrFilePath  异常发出文件
                 /// @param ptrLine      异常发出行
-                Pointer
+                Exception
                 ( const ExceptionIdentify_Type&     id
                 , const ExceptionMessageText_Type&  msg
                 , void*                             errPtr
@@ -39,9 +39,9 @@ namespace emansis {
                 , m_uLine       (ptrLine) { }
                 /// @brief      获取异常指针
                 /// @return     异常指针
-                const void*     getPtr  () const noexcept { return m_pErrPtr; }
-                /// @brief      获取异常发出地址
-                /// @return     异常发出地址
+                const void*     getValName  () const noexcept { return m_pErrPtr; }
+                /// @brief      获取异常发出文件
+                /// @return     异常发出文件
                 const char*     getPath () const noexcept { return m_szFilePath; }
                 /// @brief      获取异常发出行
                 /// @return     异常发出行
@@ -57,7 +57,7 @@ namespace emansis {
                     buffer =    "PointerException:";
                     buffer +=   toText();
                     buffer +=   "errPtr=\'0x";
-                    ss << std::hex << getPtr();
+                    ss << std::hex << getValName();
                     buffer +=   ss.str();
                     ss.str("");
                     ss.clear();
@@ -77,7 +77,7 @@ namespace emansis {
             /// @param path     异常发生文件
             /// @param line     异常发生行
             /// @param param    额外信息
-            class NullPointerException : public Pointer { public: NullPointerException(const char* path, uint32_t line, const ExceptionMessageText_Type& param = "") : Pointer(IDE_EXCEPTION_POINTER_NULLPOINTER, "This pointer is nullptr", nullptr, param, path, line) {} };
+            class NullPointerException : public Exception { public: NullPointerException(const char* path, uint32_t line, const ExceptionMessageText_Type& param = "") : Exception(IDE_EXCEPTION_POINTER_NULLPOINTER, "This pointer is nullptr", nullptr, param, path, line) {} };
         }
     }
 }
