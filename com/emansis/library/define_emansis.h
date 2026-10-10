@@ -7,7 +7,7 @@
 #ifndef VTOA_BUFFER_EMANSIS
     #ifndef VTOA_BUFFER_SIZE_EMANSIS
     #define VTOA_BUFFER_SIZE_EMANSIS 64
-    char emansis_g_bufferVtoABufr[VTOA_BUFFER_SIZE_EMANSIS] = "\0";
+    static char emansis_g_bufferVtoABufr[VTOA_BUFFER_SIZE_EMANSIS] = "\0";
     #define VTOA_BUFFER_EMANSIS (emansis_g_bufferVtoABufr)
     #endif
 #endif

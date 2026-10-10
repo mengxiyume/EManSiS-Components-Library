@@ -56,7 +56,7 @@ namespace emansis {
             virtual ExceptionOutBuffer_Type what() const noexcept { 
                 std::stringstream ss;
                 ExceptionOutBuffer_Type 
-                buffer =    "PointerException:";
+                buffer =    "RandomException:";
                 buffer +=   toText();
                 buffer +=   "seed=\'0x";
                 ss << std::hex << getSeed();
@@ -80,11 +80,7 @@ namespace emansis {
         /// @param line     异常发生行
         /// @param seed     异常种子
         /// @param param    额外信息
-        //FIXME:class RandomException : public emansis::exception::Exception { public : RandomException(ExceptionIdentify_Type errId, const char* path, uint32_t line, const emansis::random::random::InitSeed_Type seed, const ExceptionMessageText_Type& param = "") : emansis::exception::Exception(errId, "random exception", seed, param, path, line) {} };
-        class RandomException : public Exception {
-        public:
-            RandomException(ExceptionIdentify_Type errId, const int64_t seed, const char* path, uint32_t line, const ExceptionMessageText_Type& param = "") : Exception(errId, "random exception", seed, param, path, line) {};
-        };
+        class RandomException : public Exception { public: RandomException(ExceptionIdentify_Type errId, const int64_t seed, const char* path, uint32_t line, const ExceptionMessageText_Type& param = "") : Exception(errId, "random exception", seed, param, path, line) {}; };
     /// @brief              随机数空种子异常
     /// @param _SEED_       异常种子
     /// @param _PARAM_TEXT_ 额外信息
@@ -94,9 +90,10 @@ namespace emansis {
     /// @param _MAXSIZE_    最大容许量
     /// @param _VAR_        给定的量
     #define RANDOM_SHIFT_VALUE_TOO_BIG_EXCEPTION_EMANSIS(_SEED_, _MAXSIZE_, _VAR_) emansis::random::RandomException(IDE_EXCEPTION_RANDOM_OUT_OF_SHIFT_BIT, (static_cast<int64_t>(_SEED_)), __FILE__, __LINE__, \
-        std::string("Max shift size[")  += std::string(CSTR_INT8_VAR_EMANSIS(_MAXSIZE_)) += \
-        std::string("] set")            += std::string(PATCH_VAR_NAME_EMANSIS(_VAR_))   += \
-        std::string(":[")               += std::string(CSTR_INT8_VAR_EMANSIS(_VAR_))     )  
+        std::string("Max shift size[")  + std::string(CSTR_INT8_VAR_EMANSIS(_MAXSIZE_)) + \
+        std::string("] set ")           + std::string(PATCH_VAR_NAME_EMANSIS(_VAR_))    + \
+        std::string(":[")               + std::string(CSTR_INT8_VAR_EMANSIS(_VAR_))     + \
+        std::string("] does not meet requirements"))  
     /// @brief              生成器异常-类型宽度为0
     /// @param _TYPE_       异常类型
     #define RANDOM_ZERO_OF_LENGTH_EXCEPTION_EMANSIS(_TYPE_) emansis::random::RandomException(IDE_EXCEPTION_RANDOM_ZERO_OF_SHIFT_WIDTH, 0, __FILE__, __LINE__, "type[" PATCH_VAR_NAME_EMANSIS(_TYPE_) "]length is set zero")
@@ -105,10 +102,10 @@ namespace emansis {
     /// @param _MIN_        最小可生成数值
     /// @param _VAR_        当前指定的限制值
     #define RANDOM_OUT_OF_GENERAT_RANGE_SET_EXCEPTION_EMANSIS(_MAX_, _MIN_, _VAR_) emansis::random::RandomException(IDE_EXCEPTION_RANDOM_OUT_OF_GENERATE_RANGE, 0, __FILE__, __LINE__, \
-        std::string("Max generate range [") += std::string(CSTR_FP64_VAR_EMANSIS(_MAX_))    += \
-        std::string(" ~ ")                  += std::string(CSTR_FP64_VAR_EMANSIS(_MIN_))    += \
-        std::string("] -> set ")            += std::string(PATCH_VAR_NAME_EMANSIS(_VAR_))   += \
-        std::string(" [")                   += std::string(CSTR_FP64_VAR_EMANSIS(_VAR_))    += \
+        std::string("Max generate range [") + std::string(CSTR_FP64_VAR_EMANSIS(_MIN_))     + \
+        std::string(" ~ ")                  + std::string(CSTR_FP64_VAR_EMANSIS(_MAX_))     + \
+        std::string("] -> set ")            + std::string(PATCH_VAR_NAME_EMANSIS(_VAR_))    + \
+        std::string(" [")                   + std::string(CSTR_FP64_VAR_EMANSIS(_VAR_))     + \
         std::string("] does not meet requirements") )
     }
 }

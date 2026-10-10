@@ -42,12 +42,12 @@ namespace emansis {
         /// @brief              查询指定位置的位图元素的真值
         /// @param pos          坐标
         /// @return             如果该元素被设置的真值
-        bool have(uint64_t pos) { ; } //TODO: Achive the function
+        bool have(uint64_t pos) { return false; } //TODO: Achive the function
         /// @brief              设置指定位置的位图元素真值
         /// @param state        新的真值状态
         /// @param pos          坐标
         /// @return             旧的真值状态
-        bool set(bool state, uint64_t pos) { ; } //TODO: Achive the function
+        bool set(bool state, uint64_t pos) { return false; } //TODO: Achive the function
         /// @brief              查看位图内是否有内容
         /// @return             如果位图为空返回true，否则返回false
         bool empty() {
