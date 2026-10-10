@@ -21,7 +21,7 @@ namespace emansis {
         public:
             typedef int64_t InitSeed_Type;
         private:
-        #define RANDOM_SEED_LENGTH_EMANSIS (sizeof(emansis::random::Random::InitSeed_Type) * 4) //初始种子库长度为4，可更改为更高
+        #define RANDOM_SEED_LENGTH_EMANSIS (sizeof(emansis::random::Random::InitSeed_Type) * 4) //初始种子库长度为8*4，未时编译可更改为更高
             /// @brief 随机数种子集
             static bitmap<RANDOM_SEED_LENGTH_EMANSIS> gs_seed;
             /// @brief 随机数种子索引

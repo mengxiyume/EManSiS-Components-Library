@@ -84,7 +84,7 @@ Rand_Type emansis::random::Random::rand(Rand_Type lower, Rand_Type upper, uint8_
     xorShiftPlus<Rand_Type>(reg, UNMASK_BIT8_FULL_TRUE, r_1, l_1, r_2);
     //update seed index
     if (gs_seedIndex + sizeof(Rand_Type) >= RANDOM_SEED_LENGTH_EMANSIS) gs_seedIndex = 0;
-    else gs_seedIndex = sizeof(Rand_Type);
+    else gs_seedIndex += sizeof(Rand_Type);
     //seed paste
     gs_seed[gs_seedIndex] = reg;
     return (reg % (upper - lower + 1)) + lower;
