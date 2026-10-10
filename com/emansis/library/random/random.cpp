@@ -2,6 +2,7 @@
 #include "../define_emansis.h"
 #include <cstdint>
 #include <cfloat>
+#include <cmath>
 #include <algorithm>
 
 emansis::bitmap<RANDOM_SEED_LENGTH_EMANSIS> emansis::random::Random::gs_seed;
@@ -21,7 +22,20 @@ uint32_t    emansis::random::Random::rand_u32   (uint32_t   lower, uint32_t uppe
 int64_t     emansis::random::Random::rand_i64   (int64_t    lower, int64_t  upper)  noexcept { return rand(lower, upper, 42, 33, 17); }
 uint64_t    emansis::random::Random::rand_u64   (uint64_t   lower, uint64_t upper)  noexcept { return rand(lower, upper, 17, 33, 42); }
 
-
+float       emansis::random::Random::rand_fp32   (float      lower, float   upper)  noexcept { 
+    int32_t base = rand_i32();
+    float randValue = base / ((float)(1 << FLT32_EXP_SIZE_EMANSIS));
+    // abs left and right
+    if (lower > upper) std::swap(lower, upper);
+    return ((float)fmod(randValue, (upper - lower))) + lower;
+}
+double      emansis::random::Random::rand_fp64   (double     lower, double  upper)  noexcept { 
+    int64_t base = rand_i64();
+    double randValue = base / ((double)(1ll << (FLT32_EXP_SIZE_EMANSIS * 5)));
+    // abs left and right
+    if (lower > upper) std::swap(lower, upper);
+    return ((double)fmod(randValue, (upper - lower))) + lower;
+}
 
 #pragma endregion
 
