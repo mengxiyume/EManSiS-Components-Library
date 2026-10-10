@@ -12,10 +12,10 @@ namespace emansis {
     namespace random {
     #define FLT32_EXP_SIZE_EMANSIS   8
     #define FLT64_EXP_SIZE_EMANSIS   11
-    #define FLT32_RAND_MAX_EMANSIS  (INT32_MAX / (float)(1 << FLT32_EXP_SIZE_EMANSIS))
-    #define FLT32_RAND_MIN_EMANSIS  (INT32_MIN / (float)(1 << FLT32_EXP_SIZE_EMANSIS))
-    #define FLT64_RAND_MAX_EMANSIS  (INT64_MAX / (double)(1 << (FLT32_EXP_SIZE_EMANSIS) * 5))
-    #define FLT64_RAND_MIN_EMANSIS  (INT64_MIN / (double)(1 << (FLT32_EXP_SIZE_EMANSIS) * 5))
+    #define FLT32_RAND_MAX_EMANSIS  (float)(INT32_MAX / (float)(1 << FLT32_EXP_SIZE_EMANSIS))
+    #define FLT32_RAND_MIN_EMANSIS  (float)(INT32_MIN / (float)(1 << FLT32_EXP_SIZE_EMANSIS))
+    #define FLT64_RAND_MAX_EMANSIS  (double)(INT64_MAX / (double)((long long)1 << (FLT32_EXP_SIZE_EMANSIS) * 5))
+    #define FLT64_RAND_MIN_EMANSIS  (double)(INT64_MIN / (double)((long long)1 << (FLT32_EXP_SIZE_EMANSIS) * 5))
         /// @brief 随机数生成器
         class Random {
         public:
@@ -79,15 +79,20 @@ namespace emansis {
             /// @return             上下限中间的随机值
             uint64_t    rand_u64    (uint64_t   lower = 0,          uint64_t upper = UINT64_MAX)  noexcept;
             /// @brief              32位浮点数生成器
-            /// @param lower        下限 默认'-8388608f'
-            /// @param upper        上限 默认'8388607f'
+            /// @param lower        下限 默认'-8388608.0f'
+            /// @param upper        上限 默认'8388607.0f'
             /// @return             上下限中间的随机值
-            float       rand_fp32   (float      lower = FLT32_RAND_MIN_EMANSIS, float   upper = FLT32_RAND_MAX_EMANSIS) noexcept; 
+            float       rand_fp32   (float      lower = FLT32_RAND_MIN_EMANSIS, float   upper = FLT32_RAND_MAX_EMANSIS); 
             /// @brief              64位浮点数生成器
-            /// @param lower        下限默认'-8388608lf'
-            /// @param upper        上限默认'8388607.99999999lf'
+            /// @param lower        下限默认'-8388608.0'
+            /// @param upper        上限默认'8388607.99999999'
             /// @return             上下限中间的随机值
-            double      rand_fp64    (double    lower = FLT64_RAND_MIN_EMANSIS, double  upper = FLT64_RAND_MAX_EMANSIS) noexcept;
+            double      rand_fp64   (double    lower = FLT64_RAND_MIN_EMANSIS, double  upper = FLT64_RAND_MAX_EMANSIS);
+            /// @brief              百分比随机
+            /// @param lower        下限 默认'0.0'
+            /// @param upper        上限 默认'100.0'
+            /// @return             上下限中间的随机值
+            double      rand_percent(double     lower = 0.0, double upper = 100.0);    //TODO:实现百分比随机 增加百分比越界异常
             /// @brief              模板函数随机数生成器
             /// @tparam Rand_Type   随机数类型
             /// @param lower        上限值
@@ -98,6 +103,14 @@ namespace emansis {
             /// @return             上下限中间的随机值
             template<typename Rand_Type>
             Rand_Type   rand        (Rand_Type lower, Rand_Type upper, uint8_t r_1, uint8_t l_1, uint8_t r_2);
+            /// @brief              随机数生成器
+            /// @tparam Reg_Type    生成对象类型
+            /// @param reg          传入种子，种子经过计算变为结果
+            /// @param r_1          第一次右移值
+            /// @param l_1          第一次左移值
+            /// @param r_2          第二次右移值
+            template<typename Reg_Type>
+            static void xorShift(Reg_Type& reg, uint8_t r_1, uint8_t l_1, uint8_t r_2);
         private:
         
             /// @brief              种子是否有效
@@ -122,15 +135,6 @@ namespace emansis {
                 int8_t r_1, 
                 int8_t l_1,
                 int8_t r_2);
-            
-            /// @brief              随机数生成器
-            /// @tparam Reg_Type    生成对象类型
-            /// @param reg          传入种子，种子经过计算变为结果
-            /// @param r_1          第一次右移值
-            /// @param l_1          第一次左移值
-            /// @param r_2          第二次右移值
-            template<typename Reg_Type>
-            static void xorShift(Reg_Type& reg, uint8_t r_1, uint8_t l_1, uint8_t r_2);
         };
     }
 }
