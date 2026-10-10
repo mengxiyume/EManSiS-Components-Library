@@ -94,10 +94,9 @@ namespace emansis {
         /// @param _MAXSIZE_    最大容许量
         /// @param _VAR_        给定的量
         #define RANDOM_SHIFT_VALUE_TOO_BIG_EXCEPTION_EMANSIS(_SEED_, _MAXSIZE_, _VAR_) emansis::exception::Random::XorShiftRandomException(IDE_EXCEPTION_RANDOM_OUT_OF_SHIFT_BIT, __FILE__, __LINE__, ((emansis::random::Random::InitSeed_Type)_SEED_), \
-        std::string("Max shift size[")  += std::string(STR_INT8_VAR_EMANSIS(_MAXSIZE_)) += \
-        std::string("] set")            += std::string(PATCH_VAR_NAME_EMANSIS(_VAR_))   += \
-        std::string(":[")               += std::string(STR_INT8_VAR_EMANSIS(_VAR_))     )  
-        
+            std::string("Max shift size[")  += std::string(STR_INT8_VAR_EMANSIS(_MAXSIZE_)) += \
+            std::string("] set")            += std::string(PATCH_VAR_NAME_EMANSIS(_VAR_))   += \
+            std::string(":[")               += std::string(STR_INT8_VAR_EMANSIS(_VAR_))     )  
         /// @brief              生成器异常-类型宽度为0
         /// @param _TYPE_       异常类型
         #define RANDOM_ZERO_OF_LENGTH_EXCEPTION_EMANSIS(_TYPE_) emansis::exception::Random::XorShiftRandomException(IDE_EXCEPTION_RANDOM_ZERO_OF_SHIFT_WIDTH, __FILE__, __LINE__, NULL, "type[" PATCH_VAR_NAME_EMANSIS(_TYPE_) "]length is set zero")

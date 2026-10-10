@@ -1,24 +1,50 @@
 #include "./random.h"
 #include "../define_emansis.h"
 #include <cstdint>
+#include <cfloat>
 #include <algorithm>
 
 emansis::bitmap<RANDOM_SEED_LENGTH_EMANSIS> emansis::random::Random::gs_seed;
 uint8_t emansis::random::Random::gs_seedIndex = 0;
+
+#pragma region random functions
+
+int8_t      emansis::random::Random::rand_i8    (int8_t     lower, int8_t   upper)  noexcept { return rand(lower, upper, 3, 2, 5); }
+uint8_t     emansis::random::Random::rand_u8    (uint8_t    lower, uint8_t  upper)  noexcept { return rand(lower, upper, 5, 2, 3); }
+
+int16_t     emansis::random::Random::rand_i16   (int16_t    lower, int16_t  upper)  noexcept { return rand(lower, upper, 7, 9, 9); }
+uint16_t    emansis::random::Random::rand_u16   (uint16_t   lower, uint16_t upper)  noexcept { return rand(lower, upper, 9, 9, 7); }
+
+int32_t     emansis::random::Random::rand_i32   (int32_t    lower, int32_t  upper)  noexcept { return rand(lower, upper, 22, 19, 13); }
+uint32_t    emansis::random::Random::rand_u32   (uint32_t   lower, uint32_t upper)  noexcept { return rand(lower, upper, 13, 22, 19); }
+
+int64_t     emansis::random::Random::rand_i64   (int64_t    lower, int64_t  upper)  noexcept { return rand(lower, upper, 42, 33, 17); }
+uint64_t    emansis::random::Random::rand_u64   (uint64_t   lower, uint64_t upper)  noexcept { return rand(lower, upper, 17, 33, 42); }
+
+
+
+#pragma endregion
+
+emansis::random::Random::Random(InitSeed_Type seedValue) { seed(seedValue); }
+
+bool emansis::random::Random::isSeedValid() { return !gs_seed.empty(); }
+
+emansis::bitmap<RANDOM_SEED_LENGTH_EMANSIS> emansis::random::Random::seed(){ return gs_seed; }
 
 void emansis::random::Random::seed(emansis::random::Random::InitSeed_Type initSeed) {
     if (isSeedValid() && initSeed == 0) {
         throw RANDOM_SEED_OF_ZERO_EXCEPTION_EMANSIS(initSeed, "seed is dont set, and input seed is 0");
     }
     else if (initSeed != 0) { 
-        for (int i = 0; i < RANDOM_SEED_LENGTH_EMANSIS / sizeof(int64_t); i++) {
+        for (int i = 0; i < RANDOM_SEED_LENGTH_EMANSIS / sizeof(InitSeed_Type); i++) {
             //reg init
-            int64_t reg = initSeed * (i + 1) * 0x7D3EC265DC724E36 || 0xA9;
+            InitSeed_Type reg = initSeed * (i + 1) * 0x7D3EC265DC724E36 || 0xA9;
             //xorShift
-            xorShiftPlus<int64_t>(reg, UNMASK_BIT64_FULL_TRUE, i * 37, i * 29, i * 59);
+            xorShiftPlus<InitSeed_Type>(reg, UNMASK_BIT64_FULL_TRUE, i * 37, i * 29, i * 59);
             //seed paste
-            ((int64_t*)gs_seed.data())[i] = reg;
+            ((InitSeed_Type*)gs_seed.data())[i] = reg;
         }
+        
     }
     if (!isSeedValid())
         throw RANDOM_SEED_OF_ZERO_EXCEPTION_EMANSIS(initSeed, "the seed is not set, and input seed maked out seed is 0");
@@ -45,23 +71,6 @@ Rand_Type emansis::random::Random::rand(Rand_Type lower, Rand_Type upper, uint8_
     //update seed index
     if (gs_seedIndex + sizeof(Rand_Type) >= RANDOM_SEED_LENGTH_EMANSIS) gs_seedIndex = 0;
     else gs_seedIndex = sizeof(Rand_Type);
-    //seed paste
-    gs_seed[gs_seedIndex] = reg;
-    return (reg % (upper - lower + 1)) + lower;
-}
-
-int8_t emansis::random::Random::rand_i8(int8_t lower, int8_t upper) noexcept {
-    // abs left and right
-    if (lower > upper) std::swap(lower, upper);
-    //get seed
-    int8_t  reg     = gs_seed[gs_seedIndex],
-            curSeed    = reg;
-    if (reg == 0) reg = 97;
-    //xorShift
-    xorShiftPlus<int8_t>(reg, UNMASK_BIT8_FULL_TRUE, 3, 2, 5);
-    //update seed index
-    if (gs_seedIndex + 1 >= RANDOM_SEED_LENGTH_EMANSIS) gs_seedIndex = 0;
-    else ++gs_seedIndex;
     //seed paste
     gs_seed[gs_seedIndex] = reg;
     return (reg % (upper - lower + 1)) + lower;
