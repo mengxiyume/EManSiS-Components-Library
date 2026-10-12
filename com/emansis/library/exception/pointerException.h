@@ -73,14 +73,16 @@ namespace emansis {
                     return buffer;
                 }
             };
-            /// @brief          指针异常
-            /// @param path     异常发生文件
-            /// @param line     异常发生行
-            /// @param param    额外信息
-            class PointerException : public Exception { public: PointerException(const void* errPtr, const char* path, uint32_t line, const ExceptionMessageText_Type& param = "") : Exception(IDE_EXCEPTION_POINTER_NULLPOINTER, "Pointer exception", errPtr, param, path, line) {} };
-        /// @brief              空指针异常
+            /// @brief              指针异常
+            /// @param errId        异常ID
+            /// @param errMessage   异常信息
+            /// @param path         异常发生文件
+            /// @param line         异常发生行
+            /// @param param        额外信息
+            class PointerException : public Exception { public: PointerException(ExceptionIdentify_Type errId, const char* errMessage, const void* errPtr, const char* path, uint32_t line, const ExceptionMessageText_Type& param = "") : Exception(errId, errMessage, errPtr, param, path, line) {} };
+        /// @brief              指针异常-空指针
         /// @param _PARAM_TEXT_ 额外信息
-        #define NULL_POINTER_EXCEPTION_EMANSIS(_PARAM_TEXT_) emansis::exception::Pointer::PointerException(nullptr, __FILE__, __LINE__, (_PARAM_TEXT_))
+        #define NULL_POINTER_EXCEPTION_EMANSIS(_PARAM_TEXT_) emansis::exception::Pointer::PointerException(IDE_EXCEPTION_POINTER_NULLPOINTER, "the pointer is nullptr", nullptr, __FILE__, __LINE__, (_PARAM_TEXT_))
         }
     }
 }

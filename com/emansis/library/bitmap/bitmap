@@ -24,14 +24,14 @@ namespace emansis {
         /// @param index        索引值
         /// @return             索引的元素
         const uint8_t& operator[](uint8_t index) const {
-            if (index >= Length) throw OUT_OF_RANGE_BITMAP_EXCEPTION_EMANSIS(index, std::string("index longger of Length[") += std::string(CSTR_INT8_VAR_EMANSIS(Length)) += std::string("]"));
+            if (index >= Length) throw BITMAP_OUT_OF_RANGE_BITMAP_EXCEPTION_EMANSIS(index, _countof(m_arrData));
             return operator[](index);
         }
         /// @brief              取得容器内元素
         /// @param index        索引值
         /// @return             索引的元素
         uint8_t& operator[](uint8_t index) {
-            if (index >= Length) throw OUT_OF_RANGE_BITMAP_EXCEPTION_EMANSIS(index, std::string("index longger of Length[") += std::string(CSTR_INT8_VAR_EMANSIS(Length)) += std::string("]"));
+            if (index >= Length) throw BITMAP_OUT_OF_RANGE_BITMAP_EXCEPTION_EMANSIS(index, _countof(m_arrData));
             return m_arrData[index];
         }
         /// @brief              获取容器内数据

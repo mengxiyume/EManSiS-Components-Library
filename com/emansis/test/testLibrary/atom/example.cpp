@@ -106,7 +106,7 @@ void test01() {
 void test02() {
     // throw NULL_POINTER_EXCEPTION_EMANSIS("Test null pointer exception");
     int subject = 325;
-    throw OUT_OF_RANGE_BITMAP_EXCEPTION_EMANSIS(subject, "Test out of range exception");
+    throw BITMAP_OUT_OF_RANGE_BITMAP_EXCEPTION_EMANSIS(subject, "Test out of range exception");
     // emansis::example::atom::Family f1;
     // for (int i = 0; i < 30; ++i) {
     //     f1.go();
