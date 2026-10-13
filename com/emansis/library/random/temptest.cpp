@@ -25,25 +25,21 @@ void throwException() {
 }
 
 void testException() {
-    // try { throwException(); }
+    try { throwException(); }
 
-    // catch(emansis::exception::Exception& e) {
-    //     std::cout << e.what() << std::endl;
-    // }
+    catch(emansis::exception::Exception& e) {
+        std::cout << e.what() << std::endl;
+    }
 }
 
 
 
 void testRandom() {
     //TODO:test random functions
-    std::cout << "111" << std::endl;
 
 }
 
 int main() {
     testRandom();
-    testException();
-
-    
-    
+    // testException()
 }

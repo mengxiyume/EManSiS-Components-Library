@@ -10,20 +10,27 @@ uint8_t emansis::random::Random::gs_seedIndex = 0;
 
 #pragma region random functions
 
-int8_t      emansis::random::Random::rand_i8    (int8_t     lower, int8_t   upper)  noexcept { return rand(lower, upper, 3, 2, 5); }
-uint8_t     emansis::random::Random::rand_u8    (uint8_t    lower, uint8_t  upper)  noexcept { return rand(lower, upper, 5, 2, 3); }
+int8_t  emansis::random::Random::rand_i8    (int8_t     lower, int8_t   upper) noexcept { return typeOf_rand(lower, upper, 3, 2, 5); }
+int8_t  emansis::random::Random::rand       (int8_t     lower, int8_t   upper) noexcept { return rand_i8    (lower, upper); }
+uint8_t emansis::random::Random::rand_u8    (uint8_t    lower, uint8_t  upper) noexcept { return typeOf_rand(lower, upper, 5, 2, 3); }
+uint8_t emansis::random::Random::rand       (uint8_t    lower, uint8_t  upper) noexcept { return rand_u8    (lower, upper); }
 
-int16_t     emansis::random::Random::rand_i16   (int16_t    lower, int16_t  upper)  noexcept { return rand(lower, upper, 7, 9, 9); }
-uint16_t    emansis::random::Random::rand_u16   (uint16_t   lower, uint16_t upper)  noexcept { return rand(lower, upper, 9, 9, 7); }
+int16_t     emansis::random::Random::rand_i16   (int16_t    lower, int16_t  upper) noexcept { return typeOf_rand(lower, upper, 7, 9, 9); }
+int16_t     emansis::random::Random::rand       (int16_t    lower, int16_t  upper) noexcept { return rand_i16   (lower, upper); }
+uint16_t    emansis::random::Random::rand_u16   (uint16_t   lower, uint16_t upper) noexcept { return typeOf_rand(lower, upper, 9, 9, 7); }
+uint16_t    emansis::random::Random::rand       (uint16_t   lower, uint16_t upper) noexcept { return rand_u16   (lower, upper); }
 
-int32_t     emansis::random::Random::rand_i32   (int32_t    lower, int32_t  upper)  noexcept { return rand(lower, upper, 22, 19, 13); }
-uint32_t    emansis::random::Random::rand_u32   (uint32_t   lower, uint32_t upper)  noexcept { return rand(lower, upper, 13, 22, 19); }
+int32_t     emansis::random::Random::rand_i32   (int32_t    lower, int32_t  upper) noexcept { return typeOf_rand(lower, upper, 22, 19, 13); }
+int32_t     emansis::random::Random::rand       (int32_t    lower, int32_t  upper) noexcept { return rand_i32   (lower, upper); }
+uint32_t    emansis::random::Random::rand_u32   (uint32_t   lower, uint32_t upper) noexcept { return typeOf_rand(lower, upper, 13, 22, 19); }
+uint32_t    emansis::random::Random::rand       (uint32_t   lower, uint32_t upper) noexcept { return rand_u32   (lower, upper); }
 
-int64_t     emansis::random::Random::rand_i64   (int64_t    lower, int64_t  upper)  noexcept { return rand(lower, upper, 42, 33, 17); }
-uint64_t    emansis::random::Random::rand_u64   (uint64_t   lower, uint64_t upper)  noexcept { 
-    return rand(lower, upper, 17, 33, 42); }
+int64_t     emansis::random::Random::rand_i64   (int64_t    lower, int64_t  upper) noexcept { return typeOf_rand(lower, upper, 42, 33, 17); }
+int64_t     emansis::random::Random::rand       (int64_t    lower, int64_t  upper) noexcept { return rand_i64   (lower, upper); }
+uint64_t    emansis::random::Random::rand_u64   (uint64_t   lower, uint64_t upper) noexcept { return typeOf_rand(lower, upper, 17, 33, 42); }
+uint64_t    emansis::random::Random::rand       (uint64_t   lower, uint64_t upper) noexcept { return rand_u64   (lower, upper); }
 
-float       emansis::random::Random::rand_fp32   (float      lower, float   upper) {
+float   emansis::random::Random::rand_fp32  (float  lower, float    upper) {
     if (lower <= FLT32_RAND_MIN_EMANSIS)
         throw RANDOM_OUT_OF_GENERAT_RANGE_SET_EXCEPTION_EMANSIS(FLT32_RAND_MAX_EMANSIS, FLT32_RAND_MIN_EMANSIS, lower);
     if (upper >= FLT32_RAND_MIN_EMANSIS)
@@ -35,7 +42,10 @@ float       emansis::random::Random::rand_fp32   (float      lower, float   uppe
     if (lower > upper) std::swap(lower, upper);
     return ((float)fmod(randValue, (upper - lower))) + lower;
 }
-double      emansis::random::Random::rand_fp64   (double     lower, double  upper) { 
+float   emansis::random::Random::rand       (float  lower, float    upper) { return rand_fp32(lower, upper); }
+
+double  emansis::random::Random::rand_fp64  (double lower, double   upper)
+{
     if  (lower <= FLT64_RAND_MIN_EMANSIS)
         throw RANDOM_OUT_OF_GENERAT_RANGE_SET_EXCEPTION_EMANSIS(FLT64_RAND_MAX_EMANSIS, FLT64_RAND_MIN_EMANSIS, lower);
     if  (upper >= FLT64_RAND_MIN_EMANSIS)
@@ -47,15 +57,11 @@ double      emansis::random::Random::rand_fp64   (double     lower, double  uppe
     if (lower > upper) std::swap(lower, upper);
     return ((double)fmod(randValue, (upper - lower))) + lower;
 }
+double  emansis::random::Random::rand       (double lower, double   upper) { return rand_fp64(lower, upper); }
 
-double      emansis::random::Random::rand_percent(double     lower, double  upper) { 
-    if  (lower <= 0.0)
-        throw RANDOM_OUT_OF_GENERAT_RANGE_SET_EXCEPTION_EMANSIS(100.0, 0.0, lower);
-    if  (upper >= 100.0)
-        throw RANDOM_OUT_OF_GENERAT_RANGE_SET_EXCEPTION_EMANSIS(100.0, 0.0, upper);
-
-    return rand_fp64(lower, upper);
-}
+double  emansis::random::Random::one        () { return rand_fp64(0.0, 1.0); }
+double  emansis::random::Random::hundred    () { return rand_fp64(0.0, 100.0); }
+double  emansis::random::Random::thousand   () { return rand_fp64(0.0, 1000.0); }
 
 #pragma endregion
 
@@ -76,21 +82,20 @@ void emansis::random::Random::seed(emansis::random::Random::InitSeed_Type initSe
             //xorShift
             emansis::random::Random::xorShiftPlus<InitSeed_Type, sizeof(InitSeed_Type)>(
                 reg, (InitSeed_Type)UNMASK_BIT64_FULL_TRUE,
-                static_cast<int8_t>((i + 1) * 3),
-                static_cast<int8_t>((i + 1) * 2),
-                static_cast<int8_t>((i + 1) * 5));
+                static_cast<int8_t>(SHIFT_RANGE_EMANSIS((i + 1) * 3, sizeof(InitSeed_Type))),
+                static_cast<int8_t>(SHIFT_RANGE_EMANSIS((i + 1) * 2, sizeof(InitSeed_Type))),
+                static_cast<int8_t>(SHIFT_RANGE_EMANSIS((i + 1) * 5, sizeof(InitSeed_Type))));
             //seed paste
             ((InitSeed_Type*)gs_seed.data())[i] = reg;
+            }
         }
-        
-    }
     if (!isSeedValid())
         throw RANDOM_SEED_OF_ZERO_EXCEPTION_EMANSIS(initSeed, "the seed is not set, and input seed maked out seed is 0");
     gs_seedIndex = 0;
 }
 
 template<typename Rand_Type>
-Rand_Type emansis::random::Random::rand(Rand_Type lower, Rand_Type upper, uint8_t r_1, uint8_t l_1, uint8_t r_2) {
+Rand_Type emansis::random::Random::typeOf_rand(Rand_Type lower, Rand_Type upper, uint8_t r_1, uint8_t l_1, uint8_t r_2) {
     //shift width exception proc
     if  (r_1 > BITSIZE(Rand_Type))
         throw RANDOM_SHIFT_VALUE_TOO_BIG_EXCEPTION_EMANSIS(NULL, (BITSIZE(Rand_Type) - 1), r_1);
@@ -198,12 +203,9 @@ void emansis::random::Random::xorShift(Reg_Type& reg, uint8_t r_1, uint8_t l_1, 
         throw RANDOM_SHIFT_VALUE_TOO_BIG_EXCEPTION_EMANSIS(NULL, (BITSIZE(Reg_Type) - 1), l_1);
     
     //xorShift
-#define SHIFT_RANGE(_SHIFT_, _BYTE_COUNT_) (((_SHIFT_) % ((_BYTE_COUNT_) * BITSIZE_BYTE - 2)) + 1)
-    reg ^= base >> SHIFT_RANGE(r_1, sizeof(Reg_Type));
-    reg ^= base << SHIFT_RANGE(l_1, sizeof(Reg_Type));
-    reg ^= base >> SHIFT_RANGE(r_2, sizeof(Reg_Type));
-#undef SHIFT_RANGE
-
+    reg ^= base >> SHIFT_RANGE_EMANSIS(r_1, sizeof(Reg_Type));
+    reg ^= base << SHIFT_RANGE_EMANSIS(l_1, sizeof(Reg_Type));
+    reg ^= base >> SHIFT_RANGE_EMANSIS(r_2, sizeof(Reg_Type));
     //result reg exception
     if(reg == 0)
         throw RANDOM_SEED_OF_ZERO_EXCEPTION_EMANSIS(base, "the seed is not set, and input seed maked out seed is 0");

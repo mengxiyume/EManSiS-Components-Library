@@ -64,6 +64,8 @@
 
 #define BITSIZE_BYTE 8
 #define BITSIZE(_VAR_) (sizeof(_VAR_) * BITSIZE_BYTE)
+#define SHIFT_RANGE_EMANSIS(_SHIFT_, _BYTE_COUNT_) (((_SHIFT_) % ((_BYTE_COUNT_) * BITSIZE_BYTE - 2)) + 1)
+
 
 #pragma region unmask defines
 
