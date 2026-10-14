@@ -3,6 +3,7 @@
 #include <cstdio>
 #include <utility>
 #include <string>
+#include <cstdint>
 
 #pragma region to strings
 
@@ -69,16 +70,16 @@
 
 #pragma region unmask defines
 
-#define UNMASK_BIT64_FULL_TRUE  ((unsigned long long)0xFFFFFFFFFFFFFFFF)
-#define UNMASK_BIT64_FULL_FALSE ((unsigned long long)0x0000000000000000)
+#define UNMASK_BIT64_FULL_TRUE  ((uint64_t)0xFFFFFFFFFFFFFFFF)
+#define UNMASK_BIT64_FULL_FALSE ((uint64_t)0x0000000000000000)
 
-#define UNMASK_BIT32_FULL_TRUE  ((unsigned int)0xFFFFFFFF)
-#define UNMASK_BIT32_FULL_FALSE ((unsigned int)0x00000000)
+#define UNMASK_BIT32_FULL_TRUE  ((uint32_t)0xFFFFFFFF)
+#define UNMASK_BIT32_FULL_FALSE ((uint32_t)0x00000000)
 
-#define UNMASK_BIT16_FULL_TRUE  ((unsigned short)0xFFFF)
-#define UNMASK_BIT16_FULL_FALSE ((unsigned short)0x0000)
+#define UNMASK_BIT16_FULL_TRUE  ((uint16_t)0xFFFF)
+#define UNMASK_BIT16_FULL_FALSE ((uint32_t)0x0000)
 
-#define UNMASK_BIT8_FULL_TRUE   ((unsigned char)0xFF)
-#define UNMASK_BIT8_FULL_FALSE  ((unsigned char)0x00)
+#define UNMASK_BIT8_FULL_TRUE   ((uint8_t)0xFF)
+#define UNMASK_BIT8_FULL_FALSE  ((uint8_t)0x00)
 
 #pragma endregion

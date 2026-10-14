@@ -30,9 +30,9 @@ namespace emansis {
         private:
         #define RANDOM_SEED_LENGTH_EMANSIS (sizeof(emansis::random::Random::InitSeed_Type) * 4) //初始种子库长度为8*4，未时编译可更改为更高
             /// @brief 随机数种子集
-            static bitmap<RANDOM_SEED_LENGTH_EMANSIS> gs_seed;
+            bitmap<RANDOM_SEED_LENGTH_EMANSIS> m_seed;
             /// @brief 随机数种子索引
-            static uint8_t gs_seedIndex;
+            uint8_t m_uSeedIndex;
         public:
             /// @brief              随机数生成器构造
             /// @param seedValue    初始种子-为0时不更新种子
@@ -41,10 +41,10 @@ namespace emansis {
             ~Random         () = default;
             /// @brief              设置随机种子
             /// @param initSeed      初始种子-为0时不更新种子
-            static void seed(InitSeed_Type initSeed);
+            void        seed        (InitSeed_Type initSeed);
             /// @brief              获取种子集
             /// @return             种子集的拷贝
-            static bitmap<RANDOM_SEED_LENGTH_EMANSIS> seed();
+            bitmap<RANDOM_SEED_LENGTH_EMANSIS> seed();
             /// @brief              8位随机数生成器
             /// @param lower        下限 默认'-128'
             /// @param upper        上限 默认'127'
@@ -85,7 +85,7 @@ namespace emansis {
             /// @param upper        上限
             /// @return             上下限中间的随机值
             uint16_t    rand        (uint16_t   lower,              uint16_t upper)  noexcept;
-            /// @brief              32位随机数生成器
+            /// @brief              32位随机数生成器 //不知道为啥32位的用起来非常慢,尽量别用32位的吧
             /// @param lower        下限 默认'-2147483648'
             /// @param upper        上限 默认'2147483647'
             /// @return             上下限中间的随机值
@@ -104,7 +104,7 @@ namespace emansis {
             /// @param lower        下限 默认'0'
             /// @param upper        上限 默认'4294967295'
             /// @return             上下限中间的随机值
-            uint32_t    rand        (uint32_t   lower = 0,          uint32_t upper = UINT32_MAX)  noexcept;
+            uint32_t    rand        (uint32_t   lower,              uint32_t upper)  noexcept;
             /// @brief              64位随机数生成器
             /// @param lower        下限 默认'-9223372036854775808'
             /// @param upper        上限 默认'9223372036854775807'
@@ -124,7 +124,7 @@ namespace emansis {
             /// @param lower        下限
             /// @param upper        上限
             /// @return             上下限中间的随机值
-            uint64_t    rand        (uint64_t   lower,              uint64_t upper)  noexcept;
+            uint64_t    rand        (uint64_t   lower = 0,          uint64_t upper = UINT64_MAX)  noexcept;
             /// @brief              32位浮点数生成器
             /// @param lower        下限 默认'-8388608.0f'
             /// @param upper        上限 默认'8388607.0f'
@@ -154,16 +154,10 @@ namespace emansis {
             /// @brief              千分比随机
             /// @return             0.0~1000.0中间的随机值
             double      thousand    ();
-            /// @brief              模板函数随机数生成器
-            /// @tparam Rand_Type   随机数类型
-            /// @param lower        上限值
-            /// @param upper        下限值
-            /// @param r_1          第一次右移值
-            /// @param l_1          第一次左移值
-            /// @param r_2          第二次右移值
-            /// @return             上下限中间的随机值
-            template<typename Rand_Type>
-            Rand_Type   typeOf_rand (Rand_Type lower, Rand_Type upper, uint8_t r_1, uint8_t l_1, uint8_t r_2);
+            /// @brief              种子是否有效
+            /// @return             如果种子不为空返回true，否则返回false
+            bool        isSeedValid ();
+        private:
             /// @brief              随机数生成器
             /// @tparam Reg_Type    生成对象类型
             /// @param reg          传入种子，种子经过计算变为结果
@@ -171,13 +165,20 @@ namespace emansis {
             /// @param l_1          第一次左移值
             /// @param r_2          第二次右移值
             template<typename Reg_Type>
-            static void xorShift(Reg_Type& reg, uint8_t r_1, uint8_t l_1, uint8_t r_2);
-        private:
-        
-            /// @brief              种子是否有效
-            /// @return             如果种子不为空返回true，否则返回false
-            static bool  isSeedValid();
-
+            static void xorShift(Reg_Type& reg, uint8_t r_1, uint8_t l_1, uint8_t r_2);    
+            /// @brief              xorShiftPlus的专用子函数
+            /// @tparam Clip_Type   切片类型
+            /// @param curReg       临时容器
+            /// @param index        索引
+            /// @param srcSeed      源表
+            /// @param unmask       掩码表
+            /// @param r_1          第一次右移值
+            /// @param l_1          第一次左移值
+            /// @param r_2          第二次右移值
+            template<typename Clip_Type>
+            void static subFun_xorShiftPlus(
+                Clip_Type&& curReg, uint8_t& index, uint8_t* srcSeed, const uint8_t* unmask, uint8_t* dest,
+                uint8_t r_1, uint8_t l_1, uint8_t r_2);
             /// @brief              xorShiftPlus
             /// @tparam Ret_Type    数据类型
             /// @tparam Length      数据长度-byte数
@@ -196,6 +197,16 @@ namespace emansis {
                 int8_t r_1, 
                 int8_t l_1,
                 int8_t r_2);
+            /// @brief              模板函数随机数生成器
+            /// @tparam Rand_Type   随机数类型
+            /// @param lower        上限值
+            /// @param upper        下限值
+            /// @param r_1          第一次右移值
+            /// @param l_1          第一次左移值
+            /// @param r_2          第二次右移值
+            /// @return             上下限中间的随机值
+            template<typename Rand_Type>
+            Rand_Type   typeOf_rand (Rand_Type lower, Rand_Type upper, Rand_Type unmask, uint8_t r_1, uint8_t l_1, uint8_t r_2);
         };
     }
     /// @brief 全局随机数生成器生成器

@@ -1,6 +1,9 @@
 #include "./randomException.h"
 #include "../exception/pointerException.h"
 #include <iostream>
+#include "./random.h"
+#include <unordered_set>
+#include <set>
 
 void throwException() {
     int i = 0;
@@ -36,6 +39,32 @@ void testException() {
 
 void testRandom() {
     //TODO:test random functions
+
+    int seed = 128;
+    emansis::random::Random r1;
+    uint64_t count = 0;
+    try {
+        std::set<int32_t> con;
+        while (seed)
+        {
+            r1.seed(seed--);
+            // std::cout << *(uint64_t*)r1.seed().data() << ":";
+            count = 0;
+            con.clear();
+            int64_t cur = 0;
+            while (con.count((int64_t)cur) <= 0) {
+                con.insert(cur);
+                cur = r1.rand_i32 ();
+                ++count;
+
+            }
+            std::cout << count << " ";
+        }
+        con.clear();
+    }
+    catch (const emansis::exception::Exception& e) {
+        std::cout << e.what() << std::endl;
+    }
 
 }
 
