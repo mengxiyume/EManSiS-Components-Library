@@ -38,7 +38,6 @@ void testException() {
 
 
 void testRandom() {
-    //TODO:test random functions
 
     int seed = 128;
     emansis::random::Random r1;
@@ -49,12 +48,12 @@ void testRandom() {
         {
             r1.seed(seed--);
             // std::cout << *(uint64_t*)r1.seed().data() << ":";
-            count = 0;
+            count = 0; 
             con.clear();
             int64_t cur = 0;
             while (con.count((int64_t)cur) <= 0) {
                 con.insert(cur);
-                cur = r1.rand_i32 ();
+                cur = r1.rand_u64 ();
                 ++count;
 
             }

@@ -7,6 +7,8 @@
 
 #pragma region random functions
 
+//TODO:重构，将所有类型的随机数生成都更改为u64的外层封装
+
 int8_t  emansis::random::Random::rand_i8    (int8_t     lower, int8_t   upper) noexcept { *((int8_t*)m_seed.data() + m_uSeedIndex) += 1; return typeOf_rand(lower, upper, static_cast<int8_t>UNMASK_BIT8_FULL_TRUE, 3, 2, 5); }
 int8_t  emansis::random::Random::rand       (int8_t     lower, int8_t   upper) noexcept { return rand_i8    (lower, upper); }
 uint8_t emansis::random::Random::rand_u8    (uint8_t    lower, uint8_t  upper) noexcept { *((uint8_t*)m_seed.data() + m_uSeedIndex) += 1; return typeOf_rand(lower, upper, static_cast<uint8_t>UNMASK_BIT8_FULL_TRUE, 3, 2, 5); }
@@ -103,6 +105,7 @@ Rand_Type emansis::random::Random::typeOf_rand(Rand_Type lower, Rand_Type upper,
     if  (l_1 > BITSIZE(Rand_Type))
         throw RANDOM_SHIFT_VALUE_TOO_BIG_EXCEPTION_EMANSIS(NULL, (BITSIZE(Rand_Type) - 1), l_1);
     // abs left and right
+    if (lower == upper) return lower;
     if (lower > upper) std::swap(lower, upper);
     //get seed
     Rand_Type  reg     = *(Rand_Type*)(m_seed.data() + m_uSeedIndex),
@@ -114,41 +117,8 @@ Rand_Type emansis::random::Random::typeOf_rand(Rand_Type lower, Rand_Type upper,
     if (m_uSeedIndex + sizeof(Rand_Type) >= RANDOM_SEED_LENGTH_EMANSIS) m_uSeedIndex = 0;
     else m_uSeedIndex += sizeof(Rand_Type);
     //seed paste
-    m_seed[m_uSeedIndex] = reg;
-    return (reg % ((uint64_t)upper - (lower + 1))) + lower;
-}
-
-/// @brief              xorShiftPlus的专用子函数
-/// @tparam Clip_Type   切片类型
-/// @param curReg       临时容器
-/// @param index        索引
-/// @param srcSeed      源表
-/// @param unmask       掩码表
-/// @param r_1          第一次右移值
-/// @param l_1          第一次左移值
-/// @param r_2          第二次右移值
-template<typename Clip_Type>
-void emansis::random::Random::subFun_xorShiftPlus(
-    Clip_Type&& curReg, uint8_t& index, uint8_t* srcSeed, const uint8_t* unmask, uint8_t* dest,
-    uint8_t r_1, uint8_t l_1, uint8_t r_2) {
-    //shift width exception proc
-    if  (r_1 > BITSIZE(Clip_Type))
-        throw RANDOM_SHIFT_VALUE_TOO_BIG_EXCEPTION_EMANSIS(NULL, (BITSIZE(Clip_Type) - 1), r_1);
-    if  (r_2 > BITSIZE(Clip_Type))
-        throw RANDOM_SHIFT_VALUE_TOO_BIG_EXCEPTION_EMANSIS(NULL, (BITSIZE(Clip_Type) - 1), r_2);
-    if  (l_1 > BITSIZE(Clip_Type))
-        throw RANDOM_SHIFT_VALUE_TOO_BIG_EXCEPTION_EMANSIS(NULL, (BITSIZE(Clip_Type) - 1), l_1);
-    //get seed
-    curReg = (Clip_Type)*(Clip_Type*)(srcSeed + index);
-    curReg = curReg != 0 ? curReg : (index + 1) * (Clip_Type)0x7278C263DD273B1;
-    //xorShift
-    emansis::random::Random::xorShift<Clip_Type>(curReg, r_1, l_1, r_2);
-    //seed paste
-    *(Clip_Type*)(srcSeed + index) = curReg;
-    //ret paste
-    *(Clip_Type*)(dest + index) = curReg & (Clip_Type)*(unmask + index);
-    //update index
-    index += sizeof(curReg);
+    *(Rand_Type*)(m_seed.data() + m_uSeedIndex) = reg;
+    return (reg % (upper - (lower + 1))) + lower;
 }
 
 template<typename Ret_Type, uint8_t Length = sizeof(Ret_Type)>
@@ -167,44 +137,38 @@ Ret_Type emansis::random::Random::xorShiftPlus(Ret_Type& srcSeed, const Ret_Type
     Ret_Type dest;
 
     //length为byte数，从上至下，逐级过滤，最多为8，最低为1，逐层操作
-    for (uint8_t i = 0; i < Length;) {
-    #define SHIFT_FORWARD(_COUNT_, _TYPE_) ((_COUNT_) * (int32_t)(BITSIZE(_TYPE_)) / (std::min(BITSIZE(int64_t), BITSIZE(Ret_Type))))
-        if      (i + sizeof(uint64_t) <= Length) {
-            subFun_xorShiftPlus((uint64_t)0, i, reinterpret_cast<uint8_t*>(&srcSeed), reinterpret_cast<const uint8_t*>(&unmask), reinterpret_cast<uint8_t*>(&dest), SHIFT_FORWARD(r_1, uint64_t), SHIFT_FORWARD(l_1, uint64_t), SHIFT_FORWARD(r_2, uint64_t));
-        }
-        else if (i + sizeof(uint32_t) <= Length) {
-            subFun_xorShiftPlus((uint32_t)0, i, reinterpret_cast<uint8_t*>(&srcSeed), reinterpret_cast<const uint8_t*>(&unmask), reinterpret_cast<uint8_t*>(&dest), SHIFT_FORWARD(r_1, uint32_t), SHIFT_FORWARD(l_1, uint32_t), SHIFT_FORWARD(r_2, uint32_t));
-        }
-        else if (i + sizeof(uint16_t) <= Length) {
-            subFun_xorShiftPlus((uint16_t)0, i, reinterpret_cast<uint8_t*>(&srcSeed), reinterpret_cast<const uint8_t*>(&unmask), reinterpret_cast<uint8_t*>(&dest), SHIFT_FORWARD(r_1, uint16_t), SHIFT_FORWARD(l_1, uint16_t), SHIFT_FORWARD(r_2, uint16_t));
-        }
-        else {
-            subFun_xorShiftPlus((uint8_t)0, i, reinterpret_cast<uint8_t*>(&srcSeed), reinterpret_cast<const uint8_t*>(&unmask), reinterpret_cast<uint8_t*>(&dest), SHIFT_FORWARD(r_1, uint8_t), SHIFT_FORWARD(l_1, uint8_t), SHIFT_FORWARD(r_2, uint8_t));
-        }
-    #undef SHIFT_FORWARD
+    for (uint8_t index = 0; index < Length;) {
+
+        uint64_t& curReg = *(uint64_t*)((uint8_t*)(&srcSeed) + index);
+        curReg = curReg != 0 ? curReg : (index + 1) * (uint64_t)0x7278C263DD273B1;
+        //xorShift
+        xorShift_u64(curReg, r_1, l_1, r_2);
+        //ret paste
+        *(uint64_t*)(&dest + index) = curReg & (uint64_t)*(uint64_t*)(&unmask + index);
+        //update index
+        index += sizeof(curReg);
     }
     return dest;
 }
 
 
-template<typename Reg_Type>
-void emansis::random::Random::xorShift(Reg_Type& reg, uint8_t r_1, uint8_t l_1, uint8_t r_2) {
-    Reg_Type base = reg;
+void emansis::random::Random::xorShift_u64(uint64_t& reg, uint8_t r_1, uint8_t l_1, uint8_t r_2) {
+    uint64_t base = reg;
     //seed var
     if (reg == 0)
         throw RANDOM_SEED_OF_ZERO_EXCEPTION_EMANSIS(reg, "seed is dont set, and input seed is 0");
     //shift width exception proc
-    if  (r_1 > BITSIZE(Reg_Type) - 1)
-        throw RANDOM_SHIFT_VALUE_TOO_BIG_EXCEPTION_EMANSIS(NULL, (BITSIZE(Reg_Type) - 1), r_1);
-    if  (r_2 > BITSIZE(Reg_Type) - 1)
-        throw RANDOM_SHIFT_VALUE_TOO_BIG_EXCEPTION_EMANSIS(NULL, (BITSIZE(Reg_Type) - 1), r_2);
-    if  (l_1 > BITSIZE(Reg_Type) - 1)
-        throw RANDOM_SHIFT_VALUE_TOO_BIG_EXCEPTION_EMANSIS(NULL, (BITSIZE(Reg_Type) - 1), l_1);
+    if  (r_1 > BITSIZE(uint64_t) - 1)
+        throw RANDOM_SHIFT_VALUE_TOO_BIG_EXCEPTION_EMANSIS(NULL, (BITSIZE(uint64_t) - 1), r_1);
+    if  (r_2 > BITSIZE(uint64_t) - 1)
+        throw RANDOM_SHIFT_VALUE_TOO_BIG_EXCEPTION_EMANSIS(NULL, (BITSIZE(uint64_t) - 1), r_2);
+    if  (l_1 > BITSIZE(uint64_t) - 1)
+        throw RANDOM_SHIFT_VALUE_TOO_BIG_EXCEPTION_EMANSIS(NULL, (BITSIZE(uint64_t) - 1), l_1);
     
     //xorShift
-    reg ^= reg >> SHIFT_RANGE_EMANSIS(r_1, sizeof(Reg_Type));
-    reg ^= reg << SHIFT_RANGE_EMANSIS(l_1, sizeof(Reg_Type));
-    reg ^= reg >> SHIFT_RANGE_EMANSIS(r_2, sizeof(Reg_Type));
+    reg ^= reg >> SHIFT_RANGE_EMANSIS(r_1, sizeof(uint64_t));
+    reg ^= reg << SHIFT_RANGE_EMANSIS(l_1, sizeof(uint64_t));
+    reg ^= reg >> SHIFT_RANGE_EMANSIS(r_2, sizeof(uint64_t));
     //result reg exception
     if(reg == 0)
         throw RANDOM_SEED_OF_ZERO_EXCEPTION_EMANSIS(base, "the seed is not set, and input seed maked out seed is 0");

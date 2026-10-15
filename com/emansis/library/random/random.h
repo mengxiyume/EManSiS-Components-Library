@@ -158,27 +158,12 @@ namespace emansis {
             /// @return             如果种子不为空返回true，否则返回false
             bool        isSeedValid ();
         private:
-            /// @brief              随机数生成器
-            /// @tparam Reg_Type    生成对象类型
+            /// @brief              64位无符号随机数生成器
             /// @param reg          传入种子，种子经过计算变为结果
             /// @param r_1          第一次右移值
             /// @param l_1          第一次左移值
             /// @param r_2          第二次右移值
-            template<typename Reg_Type>
-            static void xorShift(Reg_Type& reg, uint8_t r_1, uint8_t l_1, uint8_t r_2);    
-            /// @brief              xorShiftPlus的专用子函数
-            /// @tparam Clip_Type   切片类型
-            /// @param curReg       临时容器
-            /// @param index        索引
-            /// @param srcSeed      源表
-            /// @param unmask       掩码表
-            /// @param r_1          第一次右移值
-            /// @param l_1          第一次左移值
-            /// @param r_2          第二次右移值
-            template<typename Clip_Type>
-            void static subFun_xorShiftPlus(
-                Clip_Type&& curReg, uint8_t& index, uint8_t* srcSeed, const uint8_t* unmask, uint8_t* dest,
-                uint8_t r_1, uint8_t l_1, uint8_t r_2);
+            static void xorShift_u64(uint64_t& reg, uint8_t r_1, uint8_t l_1, uint8_t r_2);
             /// @brief              xorShiftPlus
             /// @tparam Ret_Type    数据类型
             /// @tparam Length      数据长度-byte数
