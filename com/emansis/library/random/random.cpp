@@ -8,10 +8,11 @@
 #pragma region random functions
 
 //TODO:重构，将所有类型的随机数生成都更改为u64的外层封装
+//TODO:设计为计数模式，使用计数超过64位后立即对计数对其位置的种子进行xorshift,否则只增加计数并获取对应位置的种子
 
-int8_t  emansis::random::Random::rand_i8    (int8_t     lower, int8_t   upper) noexcept { *((int8_t*)m_seed.data() + m_uSeedIndex) += 1; return typeOf_rand(lower, upper, static_cast<int8_t>UNMASK_BIT8_FULL_TRUE, 3, 2, 5); }
+int8_t  emansis::random::Random::rand_i8    (int8_t     lower, int8_t   upper) noexcept { *((int8_t*)m_seed.data() + m_uUsedIndex) += 1; return typeOf_rand(lower, upper, static_cast<int8_t>UNMASK_BIT8_FULL_TRUE, 3, 2, 5); }
 int8_t  emansis::random::Random::rand       (int8_t     lower, int8_t   upper) noexcept { return rand_i8    (lower, upper); }
-uint8_t emansis::random::Random::rand_u8    (uint8_t    lower, uint8_t  upper) noexcept { *((uint8_t*)m_seed.data() + m_uSeedIndex) += 1; return typeOf_rand(lower, upper, static_cast<uint8_t>UNMASK_BIT8_FULL_TRUE, 3, 2, 5); }
+uint8_t emansis::random::Random::rand_u8    (uint8_t    lower, uint8_t  upper) noexcept { *((uint8_t*)m_seed.data() + m_uUsedIndex) += 1; return typeOf_rand(lower, upper, static_cast<uint8_t>UNMASK_BIT8_FULL_TRUE, 3, 2, 5); }
 uint8_t emansis::random::Random::rand       (uint8_t    lower, uint8_t  upper) noexcept { return rand_u8    (lower, upper); }
 
 int16_t     emansis::random::Random::rand_i16   (int16_t    lower, int16_t  upper) noexcept { return typeOf_rand(lower, upper, static_cast<int16_t>UNMASK_BIT16_FULL_TRUE, 2, 1, 4); }
@@ -19,14 +20,14 @@ int16_t     emansis::random::Random::rand       (int16_t    lower, int16_t  uppe
 uint16_t    emansis::random::Random::rand_u16   (uint16_t   lower, uint16_t upper) noexcept { return typeOf_rand(lower, upper, static_cast<uint16_t>UNMASK_BIT16_FULL_TRUE, 2, 1, 4); }
 uint16_t    emansis::random::Random::rand       (uint16_t   lower, uint16_t upper) noexcept { return rand_u16   (lower, upper); }
 
-int32_t     emansis::random::Random::rand_i32   (int32_t    lower, int32_t  upper) noexcept { *((int32_t*)(m_seed.data() + m_uSeedIndex)) *= 7; return typeOf_rand(lower, upper, static_cast<int32_t>UNMASK_BIT32_FULL_TRUE, 2, 4, 21); }
+int32_t     emansis::random::Random::rand_i32   (int32_t    lower, int32_t  upper) noexcept { *((int32_t*)(m_seed.data() + m_uUsedIndex)) *= 7; return typeOf_rand(lower, upper, static_cast<int32_t>UNMASK_BIT32_FULL_TRUE, 2, 4, 21); }
 int32_t     emansis::random::Random::rand       (int32_t    lower, int32_t  upper) noexcept { return rand_i32   (lower, upper); }
-uint32_t    emansis::random::Random::rand_u32   (uint32_t   lower, uint32_t upper) noexcept { *((uint32_t*)(m_seed.data() + m_uSeedIndex)) *= 7; return typeOf_rand(lower, upper, static_cast<uint32_t>UNMASK_BIT32_FULL_TRUE, 2, 4, 21); }
+uint32_t    emansis::random::Random::rand_u32   (uint32_t   lower, uint32_t upper) noexcept { *((uint32_t*)(m_seed.data() + m_uUsedIndex)) *= 7; return typeOf_rand(lower, upper, static_cast<uint32_t>UNMASK_BIT32_FULL_TRUE, 2, 4, 21); }
 uint32_t    emansis::random::Random::rand       (uint32_t   lower, uint32_t upper) noexcept { return rand_u32   (lower, upper); }
 
-int64_t     emansis::random::Random::rand_i64   (int64_t    lower, int64_t  upper) noexcept { *((int64_t*)(m_seed.data()) + m_uSeedIndex) *= 37; return typeOf_rand(lower, upper, static_cast<int64_t>UNMASK_BIT64_FULL_TRUE, 3, 25, 4); }
+int64_t     emansis::random::Random::rand_i64   (int64_t    lower, int64_t  upper) noexcept { *((int64_t*)(m_seed.data()) + m_uUsedIndex) *= 37; return typeOf_rand(lower, upper, static_cast<int64_t>UNMASK_BIT64_FULL_TRUE, 3, 25, 4); }
 int64_t     emansis::random::Random::rand       (int64_t    lower, int64_t  upper) noexcept { return rand_i64   (lower, upper); }
-uint64_t    emansis::random::Random::rand_u64   (uint64_t   lower, uint64_t upper) noexcept { *((uint64_t*)(m_seed.data()) + m_uSeedIndex) *= 37; return typeOf_rand(lower, upper, static_cast<uint64_t>UNMASK_BIT64_FULL_TRUE, 3, 25, 4); }
+uint64_t    emansis::random::Random::rand_u64   (uint64_t   lower, uint64_t upper) noexcept { *((uint64_t*)(m_seed.data()) + m_uUsedIndex) *= 37; return typeOf_rand(lower, upper, static_cast<uint64_t>UNMASK_BIT64_FULL_TRUE, 3, 25, 4); }
 uint64_t    emansis::random::Random::rand       (uint64_t   lower, uint64_t upper) noexcept { return rand_u64   (lower, upper); }
 
 float   emansis::random::Random::rand_fp32  (float  lower, float    upper) {
@@ -64,9 +65,93 @@ double  emansis::random::Random::thousand   () { return rand_fp64(0.0, 1000.0); 
 
 #pragma endregion
 
-emansis::random::Random::Random(InitSeed_Type seedValue) { seed(seedValue); }
+emansis::random::Random::Random(InitSeed_Type seedValue) : m_uUsedIndex(-1), m_uUpdatedIndex(-1) { seed(seedValue); }
 
 bool emansis::random::Random::isSeedValid() { return !m_seed.empty(); }
+
+
+//TODO:测试新写的接口
+
+void emansis::random::Random::update(size_t curIndex)
+{
+    /*如果
+    * 0~15，0~7用过了，cur位于8，used位于9，updated位于-1，判定需要更新0~7
+    * 0~15，0~6用过了，cur位于7，used位于8，updated位于-1，判定不需要更新
+    * 0~15，0~8用过了，cur位于9，used位于10，updated位于-1，判定需要更新0~7
+    * 0~15，0~8用过了，cur位于15，used位于16，updated位于7，获取的数据超出已有范围，判定更新8~15，更新后used位于-1，cur位于0
+    * 0~15，0~8用过了，cur位于16，used位于16，updated位于7，判定需要更新8~15，更新后used位于-1，cur位于0
+    * 0~15，0~15用过了，cur位于16,used位于16，updated位于-1，判定需要更新0~15，更新后used位于-1，cur位于0
+    */
+
+    //对齐异常时需处理
+    //如果updatedIndex + 1不为8的倍数,则强制对齐它
+    m_uUpdatedIndex = (m_uUpdatedIndex + 1) / sizeof(InitSeed_Type) * sizeof(InitSeed_Type) - 1;
+    
+    //TODO:日志系统的加入
+    //如果randomSeedLength不为8的整倍数时截断多余部分丢弃不使用-但是打印警告信息/输出至日志目前还没做这个系统
+    //进行used越界修正，used包含了curIndex的长度信息，used越界代表着curIndex必定越界
+    if (m_uUsedIndex >= RANDOM_SEED_LENGTH_EMANSIS / sizeof(InitSeed_Type) * sizeof(InitSeed_Type)) m_uUpdatedIndex = (size_t)-1;
+
+    //处理数据-
+    //如果
+    //0~15，used在16及之后，更新到-1
+    //0~15，used为-1时，updated如不为-1，则更新updated之后的所有数据，然后将updated复位至-1
+    //0~31，used为16，cur为16，updated为-1，updated更新至15
+    if      (m_uUsedIndex == (size_t)-1 && m_uUpdatedIndex != m_uUsedIndex) {
+        //used为-1，update不为-1时更新updated+1至之后的范围
+        updateRange(m_uUpdatedIndex + 1, RANDOM_SEED_LENGTH_EMANSIS);
+        m_uUpdatedIndex = (size_t)-1;
+    }
+    else if (curIndex - m_uUpdatedIndex > 8)
+        //cur距离updated大于8bit,更新updated到cur前的8bit对齐位
+        m_uUpdatedIndex += updateRange(m_uUpdatedIndex + 1, curIndex / sizeof(InitSeed_Type) * sizeof(InitSeed_Type));
+}
+
+bool emansis::random::Random::checkUpdate(size_t curIndex)
+{
+    /*如果
+    * 0~15，0~7用过了，cur位于8，used位于9，updated位于-1，判定需要更新0~7
+    * 0~15，0~6用过了，cur位于7，used位于8，updated位于-1，判定不需要更新
+    * 0~15，0~8用过了，cur位于9，used位于10，updated位于-1，判定需要更新0~7
+    * 0~15，0~8用过了，cur位于15，used位于16，updated位于7，获取的数据超出已有范围，判定更新8~15，更新后used位于-1，cur位于0
+    * 0~15，0~8用过了，cur位于16，used位于16，updated位于7，判定需要更新8~15，更新后used位于-1，cur位于0
+    * 0~15，0~15用过了，cur位于16,used位于16，updated位于-1，判定需要更新0~15，更新后used位于-1，cur位于0
+    */
+
+    //used为-1时的处理
+    if      (m_uUsedIndex == (size_t)-1)
+        //used与update同为-1不用更新
+        if  (m_uUpdatedIndex == m_uUsedIndex) return false;
+        //used为-1，update不为-1时更新updated+1至之后的范围
+        else return true;
+    //cur距离updated大于8bit,更新updated到cur前的8bit对齐位
+    if      (curIndex - m_uUpdatedIndex > 8) return true;
+    else return false;
+}
+
+size_t emansis::random::Random::updateRange(size_t start, size_t end)
+{
+    //TODO: throw exception start biggerst end error
+    //间隔必须为8的整数倍
+    (end - start) & sizeof(InitSeed_Type) == 0;//不为整数倍时抛异常
+
+    return end - start;
+}
+
+template <typename Get_Type>
+const Get_Type& emansis::random::Random::get()
+{
+    //获取当前随机数
+    size_t curIndex = m_uUsedIndex + 1;
+    //更新占用标记
+    m_uUsedIndex += sizeof(Get_Type);
+    //更新不再占用的种子，如果cur能获取的种子长度不足时更新末尾的所有种子并将占用标记与更新标记复位
+    checkUpdate(curIndex) && Update(m_uUsedIndex, sizeof(Get_Type))
+    //如果更新了包含cur的种子，则将cur挪动到开头位置
+    if (m_uUsedIndex == (size_t)-1) curIndex = 0; 
+    //获取对应的随机数
+    return *(Get_Type*)(m_seed.data() + curIndex);
+}
 
 emansis::bitmap<RANDOM_SEED_LENGTH_EMANSIS> emansis::random::Random::seed(){ return m_seed; }
 
@@ -91,7 +176,7 @@ void emansis::random::Random::seed(emansis::random::Random::InitSeed_Type initSe
         }
     if (!isSeedValid())
         throw RANDOM_SEED_OF_ZERO_EXCEPTION_EMANSIS(initSeed, "the seed is not set, and input seed maked out seed is 0");
-    m_uSeedIndex = 0;
+    m_uUsedIndex = 0;
 }
 
 template<typename Rand_Type>
@@ -108,21 +193,22 @@ Rand_Type emansis::random::Random::typeOf_rand(Rand_Type lower, Rand_Type upper,
     if (lower == upper) return lower;
     if (lower > upper) std::swap(lower, upper);
     //get seed
-    Rand_Type  reg     = *(Rand_Type*)(m_seed.data() + m_uSeedIndex),
+    Rand_Type  reg     = *(Rand_Type*)(m_seed.data() + m_uUsedIndex),
             curSeed    = reg;
     if (reg == 0) reg = curSeed == 0 ? curSeed + 1 : curSeed;
     //xorShift
     xorShiftPlus<Rand_Type>(reg, unmask, r_1, l_1, r_2);
     //update seed index
-    if (m_uSeedIndex + sizeof(Rand_Type) >= RANDOM_SEED_LENGTH_EMANSIS) m_uSeedIndex = 0;
-    else m_uSeedIndex += sizeof(Rand_Type);
+    if (m_uUsedIndex + sizeof(Rand_Type) >= RANDOM_SEED_LENGTH_EMANSIS) m_uUsedIndex = 0;
+    else m_uUsedIndex += sizeof(Rand_Type);
     //seed paste
-    *(Rand_Type*)(m_seed.data() + m_uSeedIndex) = reg;
+    *(Rand_Type*)(m_seed.data() + m_uUsedIndex) = reg;
     return (reg % (upper - (lower + 1))) + lower;
 }
 
-template<typename Ret_Type, uint8_t Length = sizeof(Ret_Type)>
-Ret_Type emansis::random::Random::xorShiftPlus(Ret_Type& srcSeed, const Ret_Type& unmask, int8_t r_1, int8_t l_1, int8_t r_2) {
+template <typename Ret_Type, uint8_t Length = sizeof(Ret_Type)>
+Ret_Type emansis::random::Random::xorShiftPlus(Ret_Type &srcSeed, const Ret_Type &unmask, int8_t r_1, int8_t l_1, int8_t r_2)
+{
     if (Length == 0)
         throw RANDOM_ZERO_OF_LENGTH_EXCEPTION_EMANSIS(Ret_Type);
 
@@ -150,7 +236,6 @@ Ret_Type emansis::random::Random::xorShiftPlus(Ret_Type& srcSeed, const Ret_Type
     }
     return dest;
 }
-
 
 void emansis::random::Random::xorShift_u64(uint64_t& reg, uint8_t r_1, uint8_t l_1, uint8_t r_2) {
     uint64_t base = reg;

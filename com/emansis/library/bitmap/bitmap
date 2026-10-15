@@ -8,7 +8,7 @@ namespace emansis {
 
     /// @brief          位图容器
     /// @tparam Length  位图容器的容量 字节为单位
-    template <uint8_t Length>
+    template <size_t Length>
     class bitmap {
     private:
         /// @brief      容器

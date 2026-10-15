@@ -32,7 +32,8 @@ namespace emansis {
             /// @brief 随机数种子集
             bitmap<RANDOM_SEED_LENGTH_EMANSIS> m_seed;
             /// @brief 随机数种子索引
-            uint8_t m_uSeedIndex;
+            size_t m_uUsedIndex = -1;
+            size_t m_uUpdatedIndex = -1;
         public:
             /// @brief              随机数生成器构造
             /// @param seedValue    初始种子-为0时不更新种子
@@ -157,7 +158,13 @@ namespace emansis {
             /// @brief              种子是否有效
             /// @return             如果种子不为空返回true，否则返回false
             bool        isSeedValid ();
+            template<typename Get_Type>
+            const Get_Type& get();
+
+            void update(size_t curIndex);
+            bool checkUpdate(size_t curIndex);
         private:
+            size_t updateRange(size_t start, size_t end);
             /// @brief              64位无符号随机数生成器
             /// @param reg          传入种子，种子经过计算变为结果
             /// @param r_1          第一次右移值
